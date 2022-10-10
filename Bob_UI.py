@@ -1,3 +1,5 @@
+#Created by Iman Essaghir
+
 from tkinter import *
 import tkinter.font as font
 
@@ -16,24 +18,45 @@ class BobWindow:
        
         self.t1=Entry(bd=10)
         self.t2=Entry(bd=10)
-       
+        self.lbl2.place(x=100, y=200)
+        self.t2.place(x=200, y=200)
 
        
         self.lbl1.place(x=100, y=100)
         self.t1.place(x=200, y=100)
-        self.lbl2.place(x=100, y=200)
-        self.t2.place(x=200, y=200)
-        self.b1=Button(win, text='Run')
-        self.b2=Button(win, text='Close')
-   
-        f = font.Font(family='Times New Roman', size=12, weight="bold")
-        self.b1['font'] = f
-        self.b2['font'] = f
-
-        self.b1.place(x=200, y=350)
-        self.b2.place(x=400, y=350)
        
+       
+       
+        #Next pop up window
+
+        def open_popup():
+         top= Toplevel(window)
+         top.geometry("750x250")
+         top.title("Run Window")
+         Label(top, text= "Program running, please do not close the window", font=('Helvetica 18 bold')).place(x=100,y= 80)
+
+        #Create a button in the main Window to open the popup
  
+        self.b1=Button(win, text= "Run", command= open_popup).pack(pady=300)
+
+ 
+       #After the program in done and run successfully
+       
+        #def open_popup2():
+        # top_2= Toplevel(window)
+        # top_2.geometry("750x250")
+        # top_2.title("Result Window")
+        # Label(top, text= "Program run was successful", font=('Helvetica 18 bold')).place(x=100,y= 80)
+
+        ##Create a button in the main Window to open the popup
+ 
+        #self.b2=Button(win, text= "Close", command= open_popup2).pack(pady=300)
+
+   
+     
+        win.mainloop()
+
+     
                
 mywin=BobWindow(window)
 
