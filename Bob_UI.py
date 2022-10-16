@@ -1,7 +1,6 @@
 #Created by Iman Essaghir
 
 from tkinter import *
-#from tkinter.ttk import *
 import tkinter.font as font
 
 rootWindow = Tk()
@@ -13,9 +12,9 @@ titleLabel.pack()
 img=PhotoImage(file='uosfa.png')
 Label(rootWindow,image=img).pack()
 
+rootWindow.geometry("850x750")
 
 #Adding widgets
-
 
 class BobWindow:
     def __init__(self, win):
@@ -42,21 +41,10 @@ class BobWindow:
 
         #Create a button in the main Window to open the popup
  
-        self.b1=Button(win, text= "Run", command= open_popup).pack(pady=300)
-        
-
-
-       #After the program in done and run successfully
-       
-        #def open_popup2():
-        # top_2= Toplevel(window)
-        # top_2.geometry("750x250")
-        # top_2.title("Result Window")
-        # Label(top, text= "Program run was successful", font=('Helvetica 18 bold')).place(x=100,y= 80)
-
-        #Create a button in the main Window to open the popup
- 
-        #self.b2=Button(win, text= "Close", command= open_popup2).pack(pady=300)
+        self.b1=Button(win, text= "Run", command= open_popup).pack(side=BOTTOM, anchor="center",padx=18, pady=18)
+    
+        exit_Button = Button(rootWindow, text="Exit Program", command=rootWindow.quit)
+        exit_Button.pack(side=BOTTOM, anchor="e", padx=8, pady=8)
 
    
         win.mainloop()
