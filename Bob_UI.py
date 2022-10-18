@@ -2,6 +2,7 @@
 
 from tkinter import *
 import tkinter.font as font
+import Do_Queries_Functions
 
 rootWindow = Tk()
 
@@ -38,6 +39,7 @@ class BobWindow:
             top.geometry("750x250")
             top.title("Run Window")
             Label(top, text= "Program running, please do not close the window", font=('Helvetica 18 bold')).place(x=100,y= 80)
+            Do_Queries_Functions.run(self.t1.get())
 
         #Create a button in the main Window to open the popup
  

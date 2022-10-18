@@ -204,7 +204,7 @@ def handle_unknown_files():
     for filename in unknown_list:
         if test:
             folder = test_destination_folder / folder_select_popup(filename)
-            new_name = "Manual" + filename;
+            new_name = date + filename;
             do_query(filename, new_name, folder)
 
         else:
@@ -281,20 +281,22 @@ def initialize(user_input):
         disbursement_date = today - datetime.timedelta(days = 1)
     print("Disbursement Date: " + disbursement_date.strftime("%m-%d-%y"))
 
+def run(user_input):
+    if test:
+        initialize(user_input)
+        sort_files()
+        output_sorted_files()
+        #move_files()
+    else:
+        initialize(user_input)
+        sort_files()
+        #move_files()
 
 # Main method
 def main():
-    if test:
-        initialize("23")
-        sort_files()
-        output_sorted_files()
-        move_files()
-    else:
-        initialize("user input AidYear")
-        sort_files()
-        move_files()
-
-    print("Done")
+    #run("23")
+    pass
+    #print("Done")
 
     # add imports after fixinf=x the files then uncomment
 
@@ -378,5 +380,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-raw_input("So Long, and Thanks for All the Fish.\nPRESS ENTER TO CLOSE.")
+#raw_input("So Long, and Thanks for All the Fish.\nPRESS ENTER TO CLOSE.")
 
