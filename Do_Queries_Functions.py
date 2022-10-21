@@ -104,8 +104,12 @@ def find_aid_year(filename):
             else:
                 even_aid_years.append(str(filename))
     else:
-        print("Couldn't find year of " + filename)
+        if test:
+            print("Couldn't find year of " + filename)
+        else:
+            pass
         # Possibly prompt user here with popup?
+        # Possibly set default aid year to current year?
 
 def output_sorted_files():
     print("Odds: ")
@@ -164,15 +168,32 @@ def move_to_folder(name, to_directory):
         print(e)
         pass
 
+# Copies file to folder without removing it
+def copy_to_folder(name, to_directory):
+    copy_name = name
+    copy_directory = to_directory
+    try:
+        shutil.copy(copy_name, copy_directory)
+    except FileNotFoundError as e:
+        print(e)
+    except shutil.Error:
+        print ("Already a file with the name:" + name + "at location.")
+    except IOError as e:
+        print(e)
+        pass
+
 # The old do query method from DoQueries without attach lists *modified*
-def do_query(name, new_name, destination, i=2):
+def do_query(name, new_name, archive, destination, i=2):
     this_name = folder_path + "/" + name
     this_new_name = new_name
     this_destination = str(destination)
     num = i
     if num == 2:
+        rename_file(this_name, this_destination + "/" + this_new_name)
+        this_name = this_destination + "/" + this_new_name
+        copy_to_folder(this_name, archive)
         move_to_folder(this_name, destination)
-        rename_file(this_destination + "/" + name, this_destination + "/" + this_new_name)
+        
 
 # Asks user to select a folder
 def folder_select_popup(filename):
@@ -204,15 +225,12 @@ def handle_unknown_files():
     for filename in unknown_list:
         if test:
             folder = test_destination_folder / folder_select_popup(filename)
-            new_name = date + filename;
-            do_query(filename, new_name, folder)
+            archive_folder = ""
+            new_name = date + filename + current_aid_year;
+            do_query(filename, new_name, archive_folder, folder)
 
         else:
             pass
-        # Where does new_name come from?
-        # Does the user decide it?
-        # Does it not get renamed? 
-    pass
 
 # Copy the entire file structure to a new folder
 def copy_to_archive():
@@ -247,10 +265,12 @@ def move_files():
     if test:
         for filename in file_list:
             if "External" in filename:
-                do_query(filename, date + "External" + filename, test_destination_folder / "External Award Reports/")
+                archive_folder = test_copy_folder
+                do_query(filename, date + filename + current_aid_year, archive_folder, test_destination_folder / "External Award Reports/")
             
             elif filename.startswith("Daily"):
-                do_query(filename, date + "Daily" + disbursement_date.strftime("%m-%d-%y") + filename, test_destination_folder / "Daily Reports/")
+                archive_folder = test_copy_folder
+                do_query(filename, date + "Daily" + disbursement_date.strftime("%m-%d-%y") + filename, archive_folder, test_destination_folder / "Daily Reports/")
 
             # More elif staements go here
             # copy and paste old versions but remove unused attach_lists parameter
@@ -265,7 +285,7 @@ def move_files():
     if len(unknown_list) > 0:
         handle_unknown_files()
 
-    copy_to_archive()
+    #copy_to_archive()
 
 
 # User Input - Initialize Aid year and disbursement date
