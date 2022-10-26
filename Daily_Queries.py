@@ -1,7 +1,9 @@
 # Daily Queries - to be modified based on AY and remove attachments
 # to be called in MAIN
 
-def do_dailies(move_directory):
+def do_dailies():
+    move_directory = "Daily Reports"
+
     year = "23"
     aid_year = "20" + str(int(year) - 1) + "-20" + year
     for query_name in os.listdir("."):
@@ -39,6 +41,11 @@ def do_dailies(move_directory):
     # the new file should be.  Prefix date will be added.
     if ("22" in query_name.split("-")[0]):
         for query in os.listdir("."):
+
+            # NEW FORMAT
+            #if "IL_ATHLETE_OVERAWARD" in query and year in query[:-8]:
+            #       return (query, date + query + year + ".xls", archive_directory, move_directory) 
+
             if "IL_ATHLETE_OVERAWARD" in query and year in query[:-8]:
                 do_query(query, date + " Athlete Aid Overaward " + year + ".xls", archive_directory,
                          ath_mail.attachments) 
