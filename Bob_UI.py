@@ -79,7 +79,6 @@ class BobWindow(tk.Frame):
             else:
                 self.term_warn_label.config(text = "STerm must be a number")
                 term_valid = False
-                self.b1.config(state = DISABLED)
                 return False
         elif V == "focusin":
             return True
@@ -120,7 +119,7 @@ class BobWindow(tk.Frame):
                 top.geometry("750x250")
                 top.title("Run Window")
                 Label(top, text= "Program running, please do not close the window", font=('Helvetica 18 bold')).place(x=100,y= 80)
-                Do_Queries_Functions.run(self.t1.get())
+                Do_Queries_Functions.run(self.t1.get(), "5")
             else:
                 self.bell()
                 prev = self.focus_get()
