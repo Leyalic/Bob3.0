@@ -43,7 +43,7 @@ even_aid_years = []
 unknown_list = []
 current_aid_year = ""
 STerm = ""
-folder_path = ""
+folder_path = Path()
 disbursement_date = datetime.datetime.min
 
 aid_year_regex = ["Aid[\s]?Y(ea)?r"]
@@ -65,9 +65,10 @@ def is_odd_year(year):
 
 # Search for and return aid year in filename
 def has_aid_year(filename):
+    filestring = str(filename)
     has = False
     year = 0
-    found_year = re.search("_\d\d_", filename)
+    found_year = re.search("_\d\d_", filestring)
     if found_year:
         has = True
         year = found_year.group()[1:-1]
@@ -79,11 +80,7 @@ def search_excel_file(filename):
     has = False
     year = 0
 
-    fullpath = ""
-    if ("\\" in folder_path):
-        fullpath = folder_path + "\\" + filename
-    elif ("/" in folder_path):
-        fullpath = folder_path + "/" + filename
+    fullpath = folder_path / filename
     workbook = openpyxl.load_workbook(fullpath, True)
     sheet = workbook.active
     
@@ -108,38 +105,40 @@ def find_aid_year(filename):
     global odd_aid_years
     global even_aid_years
 
-    file_year = has_aid_year(filename)
+    filestring = str(filename)
+
+    file_year = has_aid_year(filestring)
     if file_year[0]:
         if is_odd_year(file_year[1]):
-            odd_aid_years.append(str(filename))
+            odd_aid_years.append(str(filestring))
         else:
-            even_aid_years.append(str(filename))
+            even_aid_years.append(str(filestring))
 
-    elif filename.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
+    elif filestring.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
         file_year = search_excel_file(filename) # file_year: (bool has_year, str year)
         if file_year[0]:
             if is_odd_year(file_year[1]):
-                odd_aid_years.append(str(filename))
+                odd_aid_years.append(str(filestring))
             else:
-                even_aid_years.append(str(filename))
+                even_aid_years.append(str(filestring))
         else: # Default for spreadsheets is current year
             if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filename))
+                odd_aid_years.append(str(filestring))
             else:
-                even_aid_years.append(str(filename))
+                even_aid_years.append(str(filestring))
     else:
         if test:
             # Default is current year
             if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filename))
+                odd_aid_years.append(str(filestring))
             else:
-                even_aid_years.append(str(filename))
-            print("Couldn't find year of " + filename)
+                even_aid_years.append(str(filestring))
+            print("Couldn't find year of " + filestring)
         else:
             if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filename))
+                odd_aid_years.append(str(filestring))
             else:
-                even_aid_years.append(str(filename))
+                even_aid_years.append(str(filestring))
 
 
 def output_sorted_files():
@@ -164,10 +163,13 @@ def sort_files():
         root.destroy()
         folder_path = directory
         for filename in os.listdir(directory):
-            find_aid_year(filename)
+            pFilename = Path(filename)
+            find_aid_year(pFilename)
     else:
+        folder_path = Path(os.getcwd())
         for filename in os.listdir("."):
-            find_aid_year(filename)
+            pFilename = Path(filename)
+            find_aid_year(pFilename)
 
 # The old rename method from DoQueries without attach lists *modified*
 def rename_file(name, new_name, i=2):
@@ -214,18 +216,33 @@ def copy_to_folder(name, to_directory):
         pass
 
 # The old do query method from DoQueries without attach lists *modified*
-def do_query(name, new_name, archive, destination, i=2):
-    this_name = folder_path + "/" + name
-    this_new_name = new_name
+def do_query(name, new_name, legacy_archive, destination, i=2):
+    global folder_path
+    this_name = str(folder_path / Path(name))
+    this_new_name = Path(new_name)
     this_destination = str(test_destination_folder / destination)
     UOSFA_archive = str(UOSFA_archive_folder / destination)
     num = i
     if num == 2:
-        rename_file(this_name, this_destination + "/" + this_new_name)
-        this_name = this_destination + "/" + this_new_name
-        copy_to_folder(this_name, archive)
+        rename_file(this_name, str(folder_path / this_new_name))
+        this_name = str(folder_path / this_new_name)
+        copy_to_folder(this_name, legacy_archive)
         copy_to_folder(this_name, UOSFA_archive)
-        move_to_folder(this_name, destination)
+        move_to_folder(this_name, this_destination)
+
+# The do query method that only makes one archive copy
+def do_query_unknown(name, new_name, legacy_archive, destination, i=2):
+    global folder_path
+    this_name = str(folder_path / Path(name))
+    this_new_name = Path(new_name)
+    this_destination = str(test_destination_folder / destination)
+    UOSFA_archive = str(UOSFA_archive_folder / destination)
+    num = i
+    if num == 2:
+        rename_file(this_name, str(folder_path / this_new_name))
+        this_name = str(folder_path / this_new_name)
+        copy_to_folder(this_name, UOSFA_archive)
+        move_to_folder(this_name, this_destination)
         
 
 # Asks user to select a folder
@@ -242,6 +259,7 @@ def folder_select_popup(filename):
                 "Pell Reports",
                 "Scholarship Reports",
                 "Weekly Reports"
+                "Unknown Reports"
               ]
     tkinter.Label(root, text=prompt, padx=10, pady=5).pack()
     tkinter.Label(root, text=filename, fg='#00f', padx=10).pack()
@@ -315,67 +333,67 @@ def move_files():
             info = "Empty" # Stores do_query parameters
 
         # Daily Queries
-            if filename.startswith("UUFA_IL_ALL_ITEMS_OVERAWARD"):
-                info = Daily_Queries.do_dailies()
+            if info == "Empty":
+                info = Daily_Queries.do_dailies(date, current_aid_year, filename)
         # Monday Weekly Queries
-            elif filename.startswith("UUFA_WR"):
-                info = Monday_DailyQueries.do_monday_weeklies()
+            if info == "Empty" and filename.startswith("UUFA_WR"):
+                info = Monday_DailyQueries.do_monday_weeklies(date, current_aid_year, filename)
         # Budget Queries
-            elif "UUFA_BR" in filename:
-                info = Budget_Queries.do_budget_queries()
+            if info == "Empty" and "UUFA_BR" in filename or "UUFA_BR_COA" in filename:
+                info = Budget_Queries.do_budget_queries(date, current_aid_year, filename)
         # Packaging Queries
-            elif filename.startswith("UUFA_PRT_ACAD_PROG_REVIEW"):
-                info = Packaging_Queries.do_packaging_queries()
+            if info == "Empty" and filename.startswith("UUFA_PRT_ACAD_PROG_REVIEW"):
+                info = Packaging_Queries.do_packaging_queries(date, current_aid_year, filename)
         # Monthly Queries
-            elif "MR_PELL_SSN_MISMATCH" in filename:
-                info = Monthly_Queries.do_monthlies()
+            if info == "Empty" and "MR_PELL_SSN_MISMATCH" in filename:
+                info = Monthly_Queries.do_monthlies(date, current_aid_year, filename)
         # Disbursement Queries
-            elif filename.startswith("UUFA_DQ_AUTHORIZED_NOT_DISB"):
-                info = Disbursement_Queries.do_disb_queries()
+            if info == "Empty" and filename.startswith("UUFA_DQ_AUTHORIZED_NOT_DISB"):
+                info = Disbursement_Queries.do_disb_queries(date, current_aid_year, filename)
         #2nd LDR Queries
-            elif filename.startswith("UUFA_PRT_PELL_ELG_NO_PELL"):
-                info = Second_LDR.do_2nd_ldr()
+            if info == "Empty" and filename.startswith("UUFA_PRT_PELL_ELG_NO_PELL"):
+                info = Second_LDR.do_2nd_ldr(date, current_aid_year, filename)
         # End of Term Queries
-            elif filename.startswith("UUFA_EOT_ACAD_PLAN_RVW"):
-                info = EndOfTerm_Queries.do_end_of_term_queries()
+            if info == "Empty" and filename.startswith("UUFA_EOT_ACAD_PLAN_RVW"):
+                info = EndOfTerm_Queries.do_end_of_term_queries(date, current_aid_year, filename)
         # Day After LDR Queries
-            elif filename.startswith("UUFA_LDR_MIN_ENROLLMENT_ATH"):
-                info = Day_AfterLDR.do_day_after_ldr()
+            if info == "Empty" and filename.startswith("UUFA_LDR_MIN_ENROLLMENT_ATH"):
+                info = Day_AfterLDR.do_day_after_ldr(date, current_aid_year, filename)
         # Direct Loans Pre-Outbound Queries
-            elif "DLR_LOAN_ORIG_EDIT_ERR" in filename:
-                info = Direct_Loan.dl_pre_outbound()
+            if info == "Empty" and "DLR_LOAN_ORIG_EDIT_ERR" in filename:
+                info = Direct_Loan.dl_pre_outbound(date, current_aid_year, filename)
         # Alternative Loan Pre-Outbound Queries
-            elif filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
-                info = Alt_Loan_Queries.al_pre_outbound()
+            if info == "Empty" and filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
+                info = Alt_Loan_Queries.al_pre_outbound(date, current_aid_year, filename)
         # Pre-Repackaging Queries
-            elif filename.startswith("UUFA_PP"):
-                info = PrePackaging_Queries.do_pre_repackaging()
+            if info == "Empty" and filename.startswith("UUFA_PP"):
+                info = PrePackaging_Queries.do_pre_repackaging(date, current_aid_year, filename)
         # Mid-Repackaging Queries
-            elif filename.startswith("UUFA_MP"):
-                info = Mid_Repack_Queries.do_mid_repack_queries()
+            if info == "Empty" and filename.startswith("UUFA_MP"):
+                info = Mid_Repack_Queries.do_mid_repack_queries(date, current_aid_year, filename)
         # After Repackaging Queries
-            elif filename.startswith("UUFA_AP"):
-                info = After_Repack_Queries.do_after_repackaging()
+            if info == "Empty" and filename.startswith("UUFA_AP"):
+                info = After_Repack_Queries.do_after_repackaging(date, current_aid_year, filename)
         # Daily Scholarships Queries
-            elif filename.startswith("UUFA_SCHOLAR_DISB_ZERO"):
-                info = Scholarships_Queries.do_daily_scholarships()
+            if info == "Empty" and filename.startswith("UUFA_SCHOLAR_DISB_ZERO"):
+                info = Scholarships_Queries.do_daily_scholarships(date, current_aid_year, filename)
         # Weekly Scholarships Queries
-            elif ("UUFA_WS" in filename):
-                info = Scholarships_Queries.do_weekly_scholarships()
+            if info == "Empty" and ("UUFA_WS" in filename):
+                info = Scholarships_Queries.do_weekly_scholarships(date, current_aid_year, filename)
         # Budget Testing Queries
-            elif filename.startswith("UUFA_BUDGET_20"):
-                info = Budget_Queries.do_budget_test_queries()
+            if info == "Empty" and filename.startswith("UUFA_BUDGET_20"):
+                info = Budget_Queries.do_budget_test_queries(date, current_aid_year, filename)
         # ATB and 3C Queries
-            elif "UUFA_ATB" in filename:
-                info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries()
+            if info == "Empty" and "UUFA_ATB" in filename:
+                info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(date, current_aid_year, filename)
         # Remove extra files 
-            elif "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
+            if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
                 os.remove(filename)
                 print("Removed " + filename)
                 info = "Removed"
         # Transfer Student Monitoring
-            elif "_NSLDS" in filename:
-                info = Tsm_Queries.do_tsm_queries()
+            if info == "Empty" and "_NSLDS" in filename:
+                info = Tsm_Queries.do_tsm_queries(date, current_aid_year, filename)
 
         # Unknown File
             if info == "Empty":
