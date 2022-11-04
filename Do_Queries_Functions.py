@@ -1,3 +1,4 @@
+# Created by Joshua Hardy and mmason
 from asyncio.windows_events import NULL
 import os
 import re
@@ -87,18 +88,18 @@ def search_excel_file(filename):
         for cell in row:
             if any (re.match(regex_str, str(cell.value), re.IGNORECASE) for regex_str in aid_year_regex):
                 has = True
-                year = str(cell.value)[-2:]
+                year = "20" +  str(cell.value)[-2:]
                 workbook.close()
                 return (has, year)
             if cell.value is not None and cell.is_date:
                 has = True
                 year = str(cell.value.year)
+                if len(str(year)) < 4:
+                    year = "20" + year[-2:]
                 workbook.close()
                 return (has, year)
     workbook.close()
     return (has, year)
-
-
 
 def output_sorted_files():
     print("Odds: ")
@@ -206,97 +207,83 @@ def copy_to_archive():
 def move_files(filename, year, match):
     global current_aid_year
     global unknown_list
+    global disbursement_date
 
     date = time.strftime("%x").replace("/", "-")
     
-    if test:
-        if "External" in filename:
-            archive_folder = test_copy_folder
-            do_query(filename, date + filename + current_aid_year, archive_folder, "External Award Reports/")
-            
-        elif filename.startswith("Daily"):
-            archive_folder = test_copy_folder
-            do_query(filename, date + "Daily" + disbursement_date.strftime("%m-%d-%y") + filename, archive_folder, test_destination_folder / "Daily Reports/")
 
-        # More elif staements go here
-        # copy and paste old versions but remove unused attach_lists parameter
+    info = "Empty" # Stores do_query parameters
 
-        else:
-            unknown_list.append(str(filename))
+# Daily Queries
+    if info == "Empty":
+        info = Daily_Queries.do_dailies(test, date, year, filename, match)
+# Monday Weekly Queries
+    if info == "Empty": #and filename.startswith("UUFA_WR"):
+        info = Monday_DailyQueries.do_monday_weeklies(test, date, year, filename, match)
+# Budget Queries
+    if info == "Empty": #and "UUFA_BR" in filename or "UUFA_BR_COA" in filename:
+        info = Budget_Queries.do_budget_queries(test, date, year, filename, match)
+# Packaging Queries
+    if info == "Empty": #and filename.startswith("UUFA_PRT_ACAD_PROG_REVIEW"):
+        info = Packaging_Queries.do_packaging_queries(test, date, year, filename, match)
+# Monthly Queries
+    if info == "Empty": #and "MR_PELL_SSN_MISMATCH" in filename:
+        info = Monthly_Queries.do_monthlies(test, date, current_aid_year, filename, match)
+# Disbursement Queries
+    if info == "Empty": #and filename.startswith("UUFA_DQ_AUTHORIZED_NOT_DISB"):
+        info = Disbursement_Queries.do_disb_queries(test, date, year, filename, match, disbursement_date)
+#2nd LDR Queries
+    if info == "Empty": #and filename.startswith("UUFA_PRT_PELL_ELG_NO_PELL"):
+        info = Second_LDR.do_2nd_ldr(test, date, year, filename, match)
+# End of Term Queries
+    if info == "Empty": #and filename.startswith("UUFA_EOT_ACAD_PLAN_RVW"):
+        info = EndOfTerm_Queries.do_end_of_term_queries(test, date, year, filename, match)
+# Day After LDR Queries
+    if info == "Empty": #and filename.startswith("UUFA_LDR_MIN_ENROLLMENT_ATH"):
+        info = Day_AfterLDR.do_day_after_ldr(test, date, year, filename, match)
+# Direct Loans Pre-Outbound Queries
+    if info == "Empty": #and "DLR_LOAN_ORIG_EDIT_ERR" in filename:
+        info = Direct_Loan.dl_pre_outbound(test, date, year, filename, match)
+# Alternative Loan Pre-Outbound Queries
+    if info == "Empty": #and filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
+        info = Alt_Loan_Queries.al_pre_outbound(test, date, year, filename, match)
+# Pre-Repackaging Queries
+    if info == "Empty": #and filename.startswith("UUFA_PP"):
+        info = PrePackaging_Queries.do_pre_repackaging(test, date, year, filename, match)
+# Mid-Repackaging Queries
+    if info == "Empty": #and filename.startswith("UUFA_MP"):
+        info = Mid_Repack_Queries.do_mid_repack_queries(test, date, year, filename)
+# After Repackaging Queries
+    if info == "Empty": #and filename.startswith("UUFA_AP"):
+        info = After_Repack_Queries.do_after_repackaging(test, date, year, filename)
+# Daily Scholarships Queries
+    if info == "Empty": #and filename.startswith("UUFA_SCHOLAR_DISB_ZERO"):
+        info = Scholarships_Queries.do_daily_scholarships(test, date, year, filename)
+# Weekly Scholarships Queries
+    if info == "Empty": #and ("UUFA_WS" in filename):
+        info = Scholarships_Queries.do_weekly_scholarships(test, date, year, filename, match)
+# Budget Testing Queries
+    if info == "Empty": #and filename.startswith("UUFA_BUDGET_20"):
+        info = Budget_Queries.do_budget_test_queries(test, date, year, filename, match)
+# ATB and 3C Queries
+    if info == "Empty": #and "UUFA_ATB" in filename:
+        info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(test, date, year, filename)
+# Remove extra files 
+    if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
+        os.remove(filename)
+        print("Removed " + filename)
+        info = "Removed"
+# Transfer Student Monitoring
+    if info == "Empty": #and "_NSLDS" in filename:
+        info = Tsm_Queries.do_tsm_queries(test, date, year, filename, match)
+
+# Unknown File
+    if info == "Empty":
+        unknown_list.append(str(filename))
+    elif info == "Removed":
+        pass
     else:
-
-        info = "Empty" # Stores do_query parameters
-
-    # Daily Queries
-        if info == "Empty":
-            info = Daily_Queries.do_dailies(date, year, filename, match)
-    # Monday Weekly Queries
-        if info == "Empty": #and filename.startswith("UUFA_WR"):
-            info = Monday_DailyQueries.do_monday_weeklies(date, year, filename, match)
-    # Budget Queries
-        if info == "Empty": #and "UUFA_BR" in filename or "UUFA_BR_COA" in filename:
-            info = Budget_Queries.do_budget_queries(date, year, filename, match)
-    # Packaging Queries
-        if info == "Empty": #and filename.startswith("UUFA_PRT_ACAD_PROG_REVIEW"):
-            info = Packaging_Queries.do_packaging_queries(date, year, filename, match)
-    # Monthly Queries
-        if info == "Empty": #and "MR_PELL_SSN_MISMATCH" in filename:
-            info = Monthly_Queries.do_monthlies(date, current_aid_year, filename, match)
-    # Disbursement Queries
-        if info == "Empty": #and filename.startswith("UUFA_DQ_AUTHORIZED_NOT_DISB"):
-            info = Disbursement_Queries.do_disb_queries(date, year, filename, match)
-    #2nd LDR Queries
-        if info == "Empty": #and filename.startswith("UUFA_PRT_PELL_ELG_NO_PELL"):
-            info = Second_LDR.do_2nd_ldr(date, year, filename, match)
-    # End of Term Queries
-        if info == "Empty": #and filename.startswith("UUFA_EOT_ACAD_PLAN_RVW"):
-            info = EndOfTerm_Queries.do_end_of_term_queries(date, year, filename, match)
-    # Day After LDR Queries
-        if info == "Empty": #and filename.startswith("UUFA_LDR_MIN_ENROLLMENT_ATH"):
-            info = Day_AfterLDR.do_day_after_ldr(date, year, filename, match)
-    # Direct Loans Pre-Outbound Queries
-        if info == "Empty": #and "DLR_LOAN_ORIG_EDIT_ERR" in filename:
-            info = Direct_Loan.dl_pre_outbound(date, year, filename, match)
-    # Alternative Loan Pre-Outbound Queries
-        if info == "Empty": #and filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
-            info = Alt_Loan_Queries.al_pre_outbound(date, year, filename, match)
-    # Pre-Repackaging Queries
-        if info == "Empty": #and filename.startswith("UUFA_PP"):
-            info = PrePackaging_Queries.do_pre_repackaging(date, year, filename, match)
-    # Mid-Repackaging Queries
-        if info == "Empty": #and filename.startswith("UUFA_MP"):
-            info = Mid_Repack_Queries.do_mid_repack_queries(date, year, filename, match)
-    # After Repackaging Queries
-        if info == "Empty": #and filename.startswith("UUFA_AP"):
-            info = After_Repack_Queries.do_after_repackaging(date, year, filename)
-    # Daily Scholarships Queries
-        if info == "Empty": #and filename.startswith("UUFA_SCHOLAR_DISB_ZERO"):
-            info = Scholarships_Queries.do_daily_scholarships(date, year, filename)
-    # Weekly Scholarships Queries
-        if info == "Empty": #and ("UUFA_WS" in filename):
-            info = Scholarships_Queries.do_weekly_scholarships(date, year, filename, match)
-    # Budget Testing Queries
-        if info == "Empty": #and filename.startswith("UUFA_BUDGET_20"):
-            info = Budget_Queries.do_budget_test_queries(date, year, filename, match)
-    # ATB and 3C Queries
-        if info == "Empty": #and "UUFA_ATB" in filename:
-            info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(date, year, filename, match)
-    # Remove extra files 
-        if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
-            os.remove(filename)
-            print("Removed " + filename)
-            info = "Removed"
-    # Transfer Student Monitoring
-        if info == "Empty": #and "_NSLDS" in filename:
-            info = Tsm_Queries.do_tsm_queries(date, year, filename, match)
-
-    # Unknown File
-        if info == "Empty":
-            unknown_list.append(str(filename))
-        elif info == "Removed":
-            pass
-        else:
-            do_query(info)
+        do_query(info)
 
 # Asks user to select a folder
 def folder_select_popup(filename):
