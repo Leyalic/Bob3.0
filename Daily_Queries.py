@@ -2,19 +2,19 @@
 # to be called in MAIN
 import os
 
-def do_dailies(date, year, query):
-    move_directory = "Daily Reports"
-    test = True
+def do_dailies(test, date, year, query, aid_year_match):
+    
     month_folder = date[:2] + "-20" + date[-2:]
 
     #year = "23"
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
-    for query_name in os.listdir("."):
-        if query_name.startswith("UUFA_IL_ALL_ITEMS_OVERAWARD"):
-            if "22" in query_name.split("-")[0]:
-                year = "22"
-            break
-    aid_year = "20" + str(int(year) - 1) + "-20" + year
+    #for query_name in os.listdir("."):
+    #    if query_name.startswith("UUFA_IL_ALL_ITEMS_OVERAWARD"):
+    #        if "22" in query_name.split("-")[0]:
+    #            year2 = "22"
+    #        break
+    aid_year = str(int(year - 1)) + "-" + str(year)
+
     if test:
         archive_directory = os.path.realpath(os.path.join('C:\Testing Bob/Daily', aid_year, month_folder))
         royall_directory = os.path.realpath('C:\Testing Bob/Royall')
@@ -40,12 +40,18 @@ def do_dailies(date, year, query):
     if not os.path.isdir(refund_directory):
         os.makedirs(refund_directory)
 
+    year = year[2:]
     dot_index = query.find(".")
-    renamed = date + " " + query[dot_index:] + " " + year + query[:dot_index]
+    dash_index = query.rfind("-")
+    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
+
+    move_directory = "Daily Reports"
+
     toggle = True
+
     # Change File_Name to be file as it is received and _new_file_name to what
     # the new file should be.  Prefix date will be added.
-    if toggle:
+    if aid_year_match:
     #if ("22" in query_name.split("-")[0]):
         if True:
         #for query in os.listdir("."):
@@ -308,7 +314,8 @@ def do_dailies(date, year, query):
     else:
         if True:
         #for query in os.listdir("."):
-            if(year not in query_name.split("-")[0]) and (str(int(year)-1) not in query_name.split("-")[0]):
+            if toggle:
+            #if(year not in query_name.split("-")[0]) and (str(int(year)-1) not in query_name.split("-")[0]):
                 if "IL_ATHLETE_OVERAWARD" in query :
                     return (query, renamed, archive_directory, move_directory)
                     
