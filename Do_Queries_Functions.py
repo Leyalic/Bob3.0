@@ -50,8 +50,9 @@ aid_year_regex = ["Aid[\s]?Y(ea)?r"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
 
 # Directories
-test_UOSFA_directory = Path("O:/Systems/QUERIES/_DoQueries")
-UOSFA_directory = Path("O:/Systems/UOSFA Reports")
+#test_UOSFA_directory = Path("O:/Systems/UOSFA Report Archive")
+test_UOSFA_directory = Path("O:/UOSFA Reports")
+UOSFA_directory = Path("O:/UOSFA Reports")
 
 test = True
 
@@ -180,12 +181,11 @@ def do_query_unknown(name, new_name, destination, i=2):
     global folder_path
     this_name = str(folder_path / Path(name))
     this_new_name = Path(new_name)
-    this_destination = str(test_UOSFA_directory / destination)
     num = i
     if num == 2:
         rename_file(this_name, str(folder_path / this_new_name))
         this_name = str(folder_path / this_new_name)
-        move_to_folder(this_name, this_destination)
+        move_to_folder(this_name, destination)
         
 
 
@@ -325,6 +325,7 @@ def handle_unknown_files():
             folder = UOSFA_directory / folder_select_popup(filename)
             new_name = date + filename + current_aid_year;
             do_query_unknown(filename, new_name, folder)
+
 
 def aid_year_match(year):
     global current_aid_year
