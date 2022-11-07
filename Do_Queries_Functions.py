@@ -50,11 +50,8 @@ aid_year_regex = ["Aid[\s]?Y(ea)?r"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
 
 # Directories
-test_destination_folder = Path("O:/Systems/QUERIES/_DoQueries")
-test_copy_folder = Path("O:/Systems/DoQueries_Archive")
-UOSFA_archive_folder = Path("O:/Systems/UOSFA Report Archive")
-destination_folder = ""
-copy_folder = ""
+test_UOSFA_directory = Path("O:/Systems/QUERIES/_DoQueries")
+UOSFA_directory = Path("O:/Systems/UOSFA Reports")
 
 test = True
 
@@ -157,16 +154,22 @@ def copy_to_folder(name, to_directory):
         pass
 
 # The old do query method from DoQueries without attach lists *modified*
-def do_query(name, new_name, legacy_archive, destination, i=2):
+def do_query(name, new_name, legacy_archive, UOSFA_folder, i=2):
     global folder_path
+    global UOSFA_directory
+
     this_name = str(folder_path / Path(name))
     this_new_name = Path(new_name)
-    this_destination = str(test_destination_folder / destination)
+    if test:
+        this_destination = str(test_UOSFA_directory / UOSFA_folder)
+    else:       
+        this_destination = str(UOSFA_directory / UOSFA_folder)
+
     num = i
     if num == 2:
         rename_file(this_name, str(folder_path / this_new_name))
         this_name = str(folder_path / this_new_name)
-        if destination is "None":
+        if UOSFA_folder is "None":
             move_to_folder(this_name, legacy_archive)
         else:
             copy_to_folder(this_name, legacy_archive)        
@@ -177,7 +180,7 @@ def do_query_unknown(name, new_name, destination, i=2):
     global folder_path
     this_name = str(folder_path / Path(name))
     this_new_name = Path(new_name)
-    this_destination = str(test_destination_folder / destination)
+    this_destination = str(test_UOSFA_directory / destination)
     num = i
     if num == 2:
         rename_file(this_name, str(folder_path / this_new_name))
@@ -186,22 +189,22 @@ def do_query_unknown(name, new_name, destination, i=2):
         
 
 
-# Copy the entire file structure to a new folder
-def copy_to_archive():
-    if test:
-        source = test_destination_folder
-        folder_name = "Test" + str(current_aid_year)
-        destination = test_copy_folder / folder_name
-    else:
-        source = destination_folder
-        destination = copy_folder / "new folder name"
-    try:
-        shutil.copytree(source, destination)
-    except shutil.Error:
-        print ("Already a folder at location.")
-    except IOError as e:
-        print(e)
-        pass
+## Copy the entire file structure to a new folder
+#def copy_to_archive():
+#    if test:
+#        source = test_destination_folder
+#        folder_name = "Test" + str(current_aid_year)
+#        destination = test_copy_folder / folder_name
+#    else:
+#        source = destination_folder
+#        destination = copy_folder / "new folder name"
+#    try:
+#        shutil.copytree(source, destination)
+#    except shutil.Error:
+#        print ("Already a folder at location.")
+#    except IOError as e:
+#        print(e)
+#        pass
 
 # Move files to corresponding directory
 def move_files(filename, year, match):
@@ -315,11 +318,11 @@ def handle_unknown_files():
     global unknown_list
     for filename in unknown_list:
         if test:
-            folder = test_destination_folder / folder_select_popup(filename)
+            folder = test_UOSFA_directory / folder_select_popup(filename)
             new_name = date + filename + current_aid_year;
             do_query_unknown(filename, new_name, folder)
         else:
-            folder = destination_folder / folder_select_popup(filename)
+            folder = UOSFA_directory / folder_select_popup(filename)
             new_name = date + filename + current_aid_year;
             do_query_unknown(filename, new_name, folder)
 
