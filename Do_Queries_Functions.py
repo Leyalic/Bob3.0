@@ -65,18 +65,18 @@ def is_odd_year(year):
 def has_aid_year(filename):
     filestring = str(filename)
     has = False
-    year = 0
+    year = "0"
     found_year = re.search("_\d\d-", filestring)
     if found_year:
         has = True
-        year = found_year.group()[1:-1]
+        year = "20" + found_year.group()[1:-1]
     return (has, year)
 
 # Search for and return aid year in excel file
 def search_excel_file(filename):
     global folder_path
     has = False
-    year = 0
+    year = "0"
 
     fullpath = folder_path / filename
     workbook = openpyxl.load_workbook(fullpath, True)
@@ -400,14 +400,16 @@ def sort_files():
         for filename in os.listdir(directory):
             pFilename = Path(filename)
             find_aid_year(pFilename)
+        if len(unknown_list) > 0:
+                handle_unknown_files()
     else:
         folder_path = Path(os.getcwd())
         for filename in os.listdir("."):
             pFilename = Path(filename)
             find_aid_year(pFilename)
 
-            if len(unknown_list) > 0:
-                handle_unknown_files()
+        if len(unknown_list) > 0:
+            handle_unknown_files()
 
 
 # User Input - Initialize Aid year and disbursement date
