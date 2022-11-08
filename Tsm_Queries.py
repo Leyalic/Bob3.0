@@ -2,7 +2,7 @@
 # to be called in main
 import os
 
-def do_tsm_queries(test, date, year, query, aid_year_match):
+def do_tsm_queries(test, date, year, query, renamed, aid_year_match):
     #global aid_year
     #year = "19"
     #for query_name in os.listdir("."):
@@ -21,9 +21,6 @@ def do_tsm_queries(test, date, year, query, aid_year_match):
         os.makedirs(directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Pell Reports"
 
@@ -99,4 +96,4 @@ def do_tsm_queries(test, date, year, query, aid_year_match):
 
                 if ("_NSLDS_VAR_FLAG9_UG" in query) :
                     return (query, renamed, directory, move_directory)
-
+    return "Empty"

@@ -27,7 +27,7 @@ def move_orig(orig_doc, orig_doc_2, orig_docx, name):
         pass
     
 
-def dl_pre_outbound(test, date, year, query, aid_year_match):
+def dl_pre_outbound(test, date, year, query, renamed, aid_year_match):
     #global aid_year
     #year = '17'
     #for query_name in os.listdir("."):
@@ -42,6 +42,7 @@ def dl_pre_outbound(test, date, year, query, aid_year_match):
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob/Direct Loans', 'DL Pre-Outbound'))
         orig_doc = os.path.realpath(os.path.join('C:\Testing Bob\Direct Loans', 'Origination', orig_file_doc))
+        orig_doc_2 = os.path.realpath(os.path.join('C:\Testing Bob\Direct Loans', 'Origination', orig_file_doc_2))
         orig_docx = os.path.realpath(os.path.join('C:\Testing Bob\Direct Loans', 'Origination', orig_file_docx))
 
     else:
@@ -57,9 +58,6 @@ def dl_pre_outbound(test, date, year, query, aid_year_match):
     move_orig(orig_doc, orig_doc_2, orig_docx, "DL ORIG 20" + year)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Direct Loan Reports"
 
@@ -166,6 +164,7 @@ def dl_pre_outbound(test, date, year, query, aid_year_match):
 
                 if query.startswith("UUFA_DLR_UG_PLUS_REFND_IND"):
                     return (query, renamed, directory, move_directory)
+    return "Empty"
 
     #if not test:
     #    while True:

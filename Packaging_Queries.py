@@ -2,7 +2,7 @@
 # to be called in main
 import os
 
-def do_packaging_queries(test, date, year, query, aid_year_match):
+def do_packaging_queries(test, date, year, query, renamed, aid_year_match):
     #global aid_year
     #year = "23"
     #for query_name in os.listdir("."):
@@ -11,7 +11,7 @@ def do_packaging_queries(test, date, year, query, aid_year_match):
     #            year = "22"
     #        break
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
     month_folder = date[:2] + "-20" + date[-2:]
 
     # Create FOLDER variables to be used in Move() operation and establishes
@@ -28,9 +28,6 @@ def do_packaging_queries(test, date, year, query, aid_year_match):
         os.makedirs(directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Scholarship Reports"
 
@@ -371,4 +368,4 @@ def do_packaging_queries(test, date, year, query, aid_year_match):
                     
                 if query.startswith("UUFA_READY_PACKAGE" + year):
                     return (query, renamed, directory, move_directory)
-
+    return "Empty"

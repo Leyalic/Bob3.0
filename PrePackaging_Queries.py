@@ -2,7 +2,7 @@
 # to be called in main
 import os
 
-def do_pre_repackaging(test, date, year, query, aid_year_match):
+def do_pre_repackaging(test, date, year, query, renamed, aid_year_match):
     #global aid_year
     #strm = "no STRM found"
     #prompt = "What STRM is this for? (ex. 1154 = Spring 2015:"
@@ -21,7 +21,7 @@ def do_pre_repackaging(test, date, year, query, aid_year_match):
     #        else:
     #            aid_year = "20" + str(int(strm[1:3]) - 1) + "-20" + str(strm[1:3])
     #            break
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob/Pell Repackaging', aid_year))
@@ -32,9 +32,6 @@ def do_pre_repackaging(test, date, year, query, aid_year_match):
         os.makedirs(directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Pell Reports"
 
@@ -109,3 +106,4 @@ def do_pre_repackaging(test, date, year, query, aid_year_match):
                     
                 if query.startswith("UUFA_READY_REPACKAGE"):
                     return (query, renamed, directory, move_directory)
+    return "Empty"

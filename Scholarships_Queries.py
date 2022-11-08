@@ -2,14 +2,14 @@
 # to be called in main
 import os
 
-def do_daily_scholarships(test, date, year, query):
+def do_daily_scholarships(test, date, year, query, renamed):
     #year = "23"
     #for query_name in os.listdir("."):
     #    if query_name.startswith("UUFA_SCHOLAR_DISB_ZERO"):
     #        year = str(int(re.search(r'\d+', query_name).group()))
     #        break
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob', aid_year + ' Scholar\Queries'))
@@ -21,9 +21,6 @@ def do_daily_scholarships(test, date, year, query):
         os.makedirs(directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Scholarship Reports"
 
@@ -40,11 +37,11 @@ def do_daily_scholarships(test, date, year, query):
 
         if query.startswith("UUFA_SCHOLAR_AUTH_NOT_DISB") :
             return (query, renamed, directory, move_directory)
-
+    return "Empty"
  
 
 # Weekly Scholarships Queries
-def do_weekly_scholarships(test, date, year, query, aid_year_match):
+def do_weekly_scholarships(test, date, year, query, renamed, aid_year_match):
     #year = "23"
     #aid_year = "2023"
     #for query_name in os.listdir("."):
@@ -52,7 +49,7 @@ def do_weekly_scholarships(test, date, year, query, aid_year_match):
     #        year = "22"
     #        break
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob/Scholarships', aid_year + ' Scholar\Queries'))
@@ -72,9 +69,6 @@ def do_weekly_scholarships(test, date, year, query, aid_year_match):
         os.makedirs(directory_errors)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Scholarship Reports"
     external_directory = "External Award Reports"
@@ -225,3 +219,4 @@ def do_weekly_scholarships(test, date, year, query, aid_year_match):
 
                 if ("WS_SCHOLAR_STATUS" in query):
                         return (query, renamed, directory, move_directory)
+    return "Empty"

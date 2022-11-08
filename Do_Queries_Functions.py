@@ -51,7 +51,8 @@ date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})
 
 # Directories
 #test_UOSFA_directory = Path("O:/Systems/UOSFA Report Archive")
-test_UOSFA_directory = Path("O:/UOSFA Reports")
+#test_UOSFA_directory = Path("O:/UOSFA Reports")
+test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
 UOSFA_directory = Path("O:/UOSFA Reports")
 
 test = True
@@ -187,7 +188,31 @@ def do_query_unknown(name, new_name, destination, i=2):
         this_name = str(folder_path / this_new_name)
         move_to_folder(this_name, destination)
         
+def new_name(name, year):
+    hay_result = has_aid_year(name)
+    renamed = ""
+    if hay_result[0]:
+        dot_index = name.find(".")
+        dash_index = name.rfind("-")
+        renamed = date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
+    else:
+        dot_index = name.find(".")
+        dash_index = name.rfind("-")
+        renamed = date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
+    return renamed
 
+def new_name_disb(name, year):
+    hay_result = has_aid_year(name)
+    renamed = ""
+    if hay_result[0]:
+        dot_index = name.find(".")
+        dash_index = name.rfind("-")
+        renamed = disbursement_date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
+    else:
+        dot_index = name.find(".")
+        dash_index = name.rfind("-")
+        renamed = disbursement_date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
+    return renamed
 
 ## Copy the entire file structure to a new folder
 #def copy_to_archive():
@@ -213,64 +238,66 @@ def move_files(filename, year, match):
     global disbursement_date
 
     date = time.strftime("%x").replace("/", "-")
+    renamed = new_name(filename, year)
+    renamed_disb = new_name_disb(filename, year)
     
 
     info = "Empty" # Stores do_query parameters
 
 # Daily Queries
     if info == "Empty":
-        info = Daily_Queries.do_dailies(test, date, year, filename, match)
+        info = Daily_Queries.do_dailies(test, date, year, filename, renamed, match)
 # Monday Weekly Queries
     if info == "Empty": #and filename.startswith("UUFA_WR"):
-        info = Monday_DailyQueries.do_monday_weeklies(test, date, year, filename, match)
+        info = Monday_DailyQueries.do_monday_weeklies(test, date, year, filename, renamed, match)
 # Budget Queries
     if info == "Empty": #and "UUFA_BR" in filename or "UUFA_BR_COA" in filename:
-        info = Budget_Queries.do_budget_queries(test, date, year, filename, match)
+        info = Budget_Queries.do_budget_queries(test, date, year, filename, renamed, match)
 # Packaging Queries
     if info == "Empty": #and filename.startswith("UUFA_PRT_ACAD_PROG_REVIEW"):
-        info = Packaging_Queries.do_packaging_queries(test, date, year, filename, match)
+        info = Packaging_Queries.do_packaging_queries(test, date, year, filename, renamed, match)
 # Monthly Queries
     if info == "Empty": #and "MR_PELL_SSN_MISMATCH" in filename:
-        info = Monthly_Queries.do_monthlies(test, date, current_aid_year, filename, match)
+        info = Monthly_Queries.do_monthlies(test, date, current_aid_year, filename, renamed, match)
 # Disbursement Queries
     if info == "Empty": #and filename.startswith("UUFA_DQ_AUTHORIZED_NOT_DISB"):
-        info = Disbursement_Queries.do_disb_queries(test, date, year, filename, match, disbursement_date)
+        info = Disbursement_Queries.do_disb_queries(test, date, year, filename, renamed_disb, match, disbursement_date)
 #2nd LDR Queries
     if info == "Empty": #and filename.startswith("UUFA_PRT_PELL_ELG_NO_PELL"):
-        info = Second_LDR.do_2nd_ldr(test, date, year, filename, match)
+        info = Second_LDR.do_2nd_ldr(test, date, year, filename, renamed, match)
 # End of Term Queries
     if info == "Empty": #and filename.startswith("UUFA_EOT_ACAD_PLAN_RVW"):
-        info = EndOfTerm_Queries.do_end_of_term_queries(test, date, year, filename, match)
+        info = EndOfTerm_Queries.do_end_of_term_queries(test, date, year, filename, renamed, match)
 # Day After LDR Queries
     if info == "Empty": #and filename.startswith("UUFA_LDR_MIN_ENROLLMENT_ATH"):
-        info = Day_AfterLDR.do_day_after_ldr(test, date, year, filename, match)
+        info = Day_AfterLDR.do_day_after_ldr(test, date, year, filename, renamed, match)
 # Direct Loans Pre-Outbound Queries
-    if info == "Empty": #and "DLR_LOAN_ORIG_EDIT_ERR" in filename:
-        info = Direct_Loan.dl_pre_outbound(test, date, year, filename, match)
-# Alternative Loan Pre-Outbound Queries
-    if info == "Empty": #and filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
-        info = Alt_Loan_Queries.al_pre_outbound(test, date, year, filename, match)
+#    if info == "Empty": #and "DLR_LOAN_ORIG_EDIT_ERR" in filename:
+#        info = Direct_Loan.dl_pre_outbound(test, date, year, filename, renamed, match)
+## Alternative Loan Pre-Outbound Queries
+#    if info == "Empty": #and filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
+#        info = Alt_Loan_Queries.al_pre_outbound(test, date, year, filename, renamed, match)
 # Pre-Repackaging Queries
     if info == "Empty": #and filename.startswith("UUFA_PP"):
-        info = PrePackaging_Queries.do_pre_repackaging(test, date, year, filename, match)
+        info = PrePackaging_Queries.do_pre_repackaging(test, date, year, filename, renamed, match)
 # Mid-Repackaging Queries
     if info == "Empty": #and filename.startswith("UUFA_MP"):
-        info = Mid_Repack_Queries.do_mid_repack_queries(test, date, year, filename)
+        info = Mid_Repack_Queries.do_mid_repack_queries(test, date, year, filename, renamed)
 # After Repackaging Queries
     if info == "Empty": #and filename.startswith("UUFA_AP"):
-        info = After_Repack_Queries.do_after_repackaging(test, date, year, filename)
+        info = After_Repack_Queries.do_after_repackaging(test, date, year, filename, renamed)
 # Daily Scholarships Queries
     if info == "Empty": #and filename.startswith("UUFA_SCHOLAR_DISB_ZERO"):
-        info = Scholarships_Queries.do_daily_scholarships(test, date, year, filename)
+        info = Scholarships_Queries.do_daily_scholarships(test, date, year, filename, renamed)
 # Weekly Scholarships Queries
     if info == "Empty": #and ("UUFA_WS" in filename):
-        info = Scholarships_Queries.do_weekly_scholarships(test, date, year, filename, match)
+        info = Scholarships_Queries.do_weekly_scholarships(test, date, year, filename, renamed, match)
 # Budget Testing Queries
     if info == "Empty": #and filename.startswith("UUFA_BUDGET_20"):
-        info = Budget_Queries.do_budget_test_queries(test, date, year, filename, match)
+        info = Budget_Queries.do_budget_test_queries(test, date, year, filename, renamed, match)
 # ATB and 3C Queries
     if info == "Empty": #and "UUFA_ATB" in filename:
-        info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(test, date, year, filename)
+        info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(test, date, year, filename, renamed)
 # Remove extra files 
     if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
         os.remove(filename)
@@ -278,7 +305,7 @@ def move_files(filename, year, match):
         info = "Removed"
 # Transfer Student Monitoring
     if info == "Empty": #and "_NSLDS" in filename:
-        info = Tsm_Queries.do_tsm_queries(test, date, year, filename, match)
+        info = Tsm_Queries.do_tsm_queries(test, date, year, filename, renamed, match)
 
 # Unknown File
     if info == "Empty":
@@ -286,7 +313,7 @@ def move_files(filename, year, match):
     elif info == "Removed":
         pass
     else:
-        do_query(info)
+        do_query(info[0], info[1], info[2], info[3])
 
 # Asks user to select a folder
 def folder_select_popup(filename):
@@ -422,10 +449,12 @@ def initialize(year):
     today = datetime.date.today()
     if today.weekday() == 0:
         disbursement_date = today - datetime.timedelta(days = 3)
+        disbursement_date = disbursement_date.strftime("%m-%d-%y")
     else:
         disbursement_date = today - datetime.timedelta(days = 1)
+        disbursement_date = disbursement_date.strftime("%m-%d-%y")
     if test:
-        print("Disbursement Date: " + disbursement_date.strftime("%m-%d-%y"))
+        print("Disbursement Date: " + disbursement_date)
 
 def run(year):
     if test:

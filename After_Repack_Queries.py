@@ -2,11 +2,11 @@
 # to be called in main
 import os
 
-def do_after_repackaging(test, date, year, query):
+def do_after_repackaging(test, date, year, query, renamed):
     #global aid_year
     #strm = "no STRM found"
     #prompt = "What STRM is this for? (ex. 1154 = Spring 2015:"
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
     #for query_name in os.listdir("."):
     #    if query_name.startswith("UUFA_AP"):
     #        while True:
@@ -31,9 +31,6 @@ def do_after_repackaging(test, date, year, query):
         os.makedirs(directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Pell Reports"
 
@@ -81,4 +78,4 @@ def do_after_repackaging(test, date, year, query):
 
         if query.startswith("UUFA_AP_RPKG_TERM_TQ"):
             return (query, renamed, directory, move_directory)
-
+    return "Empty"

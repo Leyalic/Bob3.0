@@ -2,7 +2,7 @@
 # to be called in main
 import os
 
-def do_atb_fb_3c_queries(test, date, year, query):
+def do_atb_fb_3c_queries(test, date, year, query, renamed):
     #global aid_year
     #year = "23"
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
@@ -21,9 +21,6 @@ def do_atb_fb_3c_queries(test, date, year, query):
         os.makedirs(atb_directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Daily Reports"
     other_directory = "Daily Reports"
@@ -71,3 +68,4 @@ def do_atb_fb_3c_queries(test, date, year, query):
             return (query, renamed, atb_directory, other_directory)
         if ("UUFA_ATB_SEQUENCE_DIFFERENCE" in query):
             return (query, renamed, atb_directory, other_directory)
+    return "Empty"

@@ -3,7 +3,7 @@
 # To be modified and called in Main 
 import os
 
-def do_monday_weeklies(test, date, year, query, aid_year_match):
+def do_monday_weeklies(test, date, year, query, renamed, aid_year_match):
     #global aid_year
     #global year
     #for query_name in os.listdir("."):
@@ -11,7 +11,7 @@ def do_monday_weeklies(test, date, year, query, aid_year_match):
     #        year = str(int(re.search(r'\d+', query_name).group()))
     #        break
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
     month_folder = date[:2] + "-20" + date[-2:]
 
     # Create FOLDER variables to be used in Move() operation and establishes
@@ -38,9 +38,6 @@ def do_monday_weeklies(test, date, year, query, aid_year_match):
         os.makedirs(save_directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Weekly Reports"
     pack_directory = "Weekly Reports"
@@ -888,3 +885,4 @@ def do_monday_weeklies(test, date, year, query, aid_year_match):
 
                 if "PRT_ATH_OFFERED_FED_AID" in query :
                     return (query, renamed, packaging_directory, pack_directory)
+    return "Empty"

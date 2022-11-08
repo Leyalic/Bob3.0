@@ -2,7 +2,7 @@
 # to be called in main
 import os
 
-def do_disb_queries(test, date, year, query, aid_year_match, disb_date):
+def do_disb_queries(test, date, year, query, renamed, aid_year_match, disb_date):
     #global aid_year
     #year = "23"
     #for query_name in os.listdir("."):
@@ -14,7 +14,7 @@ def do_disb_queries(test, date, year, query, aid_year_match, disb_date):
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
     #disb_date = str(raw_input("Enter Date the most recent Disbursement ran in 'MM-DD-YY' format:"))
     #disb_date = disb_date[:-1]
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
     month_folder = date[:2] + "-20" + date[-2:]
 
     if test:
@@ -27,9 +27,6 @@ def do_disb_queries(test, date, year, query, aid_year_match, disb_date):
         os.makedirs(directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = disb_date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Daily Reports"
 
@@ -165,5 +162,5 @@ def do_disb_queries(test, date, year, query, aid_year_match, disb_date):
 
                 if query.startswith("UUFA_DQ_DISB_BREAKDOWN") :
                     return (query, renamed, directory, move_directory)
-
+    return "Empty"
 

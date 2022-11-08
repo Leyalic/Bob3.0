@@ -2,14 +2,14 @@
 # to be called in main
 import os
 
-def do_day_after_ldr(test, date, year, query, aid_year_match):
+def do_day_after_ldr(test, date, year, query, renamed, aid_year_match):
     #global aid_year
     #for query_name in os.listdir("."):
     #    if query_name.startswith("UUFA_PRT_PELL_ELG_NO_PELL"):
     #        year = str(int(re.search(r'\d+', query_name).group()))
     #        break
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob/LDR', aid_year))
@@ -21,9 +21,6 @@ def do_day_after_ldr(test, date, year, query, aid_year_match):
         os.makedirs(directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Daily Reports"
 
@@ -165,4 +162,4 @@ def do_day_after_ldr(test, date, year, query, aid_year_match):
 
                 if query.startswith("UUFA_ATH_NO_MTRC_STU_BAL_OWING"):
                     return (query, renamed, directory, move_directory)
-
+    return "Empty"

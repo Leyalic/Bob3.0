@@ -2,7 +2,7 @@
 # to be called in main
 import os
 
-def do_mid_repack_queries(test, date, year, query):
+def do_mid_repack_queries(test, date, year, query, renamed):
     #global aid_year
     #strm = "no STRM found"
     #prompt = "What STRM is this for? (EX. 1154 = Spring 2015:)"
@@ -21,7 +21,7 @@ def do_mid_repack_queries(test, date, year, query):
     #        else:
     #            aid_year = "20" + str(int(strm[1:3]) - 1) + "-20" + str(strm[1:3])
     #            break
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
         directory = os.path.realpath(os.path.join('C:/QueryRunnerProj/Testing/Test/Pell Repackaging', aid_year))
@@ -34,9 +34,6 @@ def do_mid_repack_queries(test, date, year, query):
     #year = aid_year[7:]
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Pell Reports"
 
@@ -74,4 +71,4 @@ def do_mid_repack_queries(test, date, year, query):
 
         if query.startswith("UUFA_MP_RPKG_VER_UNFLAG"):
             return (query, renamed, directory, move_directory)
-
+    return "Empty"

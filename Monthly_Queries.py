@@ -4,7 +4,7 @@ import calendar
 import datetime
 import os
 
-def do_monthlies(test, date, year, query, aid_year_match):
+def do_monthlies(test, date, year, query, renamed, aid_year_match):
     #aid_year = "2023"
     #year = "23"
     #for query_name in os.listdir("."):
@@ -45,9 +45,6 @@ def do_monthlies(test, date, year, query, aid_year_match):
         os.makedirs(t_directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Monthly Reports"
     direct_directory = "Monthly Reports"
@@ -387,5 +384,5 @@ def do_monthlies(test, date, year, query, aid_year_match):
 
                 if "_MR_RNDM_GRAD_ENR_CHANG" in query :
                     return (query, renamed, directory, move_directory)
-
+    return "Empty"
 

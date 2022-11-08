@@ -18,7 +18,7 @@ def move_orig(orig_doc, orig_docx, name, aid_year):
     except shutil.Error:
         pass
 
-def al_pre_outbound(test, date, year, query, aid_year_match):
+def al_pre_outbound(test, date, year, query, renamed, aid_year_match):
     #global aid_year
     #for query_name in os.listdir("."):
     #    if query_name.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
@@ -26,7 +26,7 @@ def al_pre_outbound(test, date, year, query, aid_year_match):
     #        break
     #aid_year = "20" + str(int(year) - 1) + "-20" + year
     #skip = "n"
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
     orig_file_doc = date + " ALT Loan ORIG " + year + ".doc"
     orig_file_docx = date + " ALT Loan ORIG " + year + ".docx"
 
@@ -46,9 +46,6 @@ def al_pre_outbound(test, date, year, query, aid_year_match):
     move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Alternative Loan Reports"
 
@@ -148,7 +145,7 @@ def al_pre_outbound(test, date, year, query, aid_year_match):
 
                 if query.startswith("UUFA_ALR_LOAN_SPC_NEED_OVWD") :
                     return (query, renamed, directory, move_directory)
-
+    return "Empty"
     #if not test:
     #    while True:
     #        if os.path.isfile(orig_doc):

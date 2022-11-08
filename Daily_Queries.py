@@ -2,7 +2,7 @@
 # to be called in MAIN
 import os
 
-def do_dailies(test, date, year, query, aid_year_match):
+def do_dailies(test, date, year, query, renamed, aid_year_match):
     
     month_folder = date[:2] + "-20" + date[-2:]
 
@@ -13,7 +13,7 @@ def do_dailies(test, date, year, query, aid_year_match):
     #        if "22" in query_name.split("-")[0]:
     #            year2 = "22"
     #        break
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
         archive_directory = os.path.realpath(os.path.join('C:\Testing Bob/Daily', aid_year, month_folder))
@@ -41,9 +41,6 @@ def do_dailies(test, date, year, query, aid_year_match):
         os.makedirs(refund_directory)
 
     year = year[2:]
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "Daily Reports"
 

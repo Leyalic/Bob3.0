@@ -2,7 +2,7 @@
 # to be called in main
 import os
 
-def do_end_of_term_queries(test, date, year, query, aid_year_match):
+def do_end_of_term_queries(test, date, year, query, renamed, aid_year_match):
     #global aid_year
     #term = 'F'
     #strm = "Error"
@@ -16,7 +16,7 @@ def do_end_of_term_queries(test, date, year, query, aid_year_match):
     #            if term == 'S' or term == 'U' or term == 'F':
     #                break
 
-    aid_year = str(int(year - 1)) + "-" + str(year)
+    aid_year = str(int(year) - 1) + "-" + str(year)
     year = aid_year[-2:]
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob/SAP/', "20" + year))
@@ -25,10 +25,6 @@ def do_end_of_term_queries(test, date, year, query, aid_year_match):
 
     if not os.path.isdir(directory):
         os.makedirs(directory)
-
-    dot_index = query.find(".")
-    dash_index = query.rfind("-")
-    renamed = date + " " + query[dash_index:] + " " + year + query[:dot_index]
 
     move_directory = "SAP Reports"
 
@@ -191,4 +187,4 @@ def do_end_of_term_queries(test, date, year, query, aid_year_match):
 
                 if "EOT_WUE_ACAD_PROG_REV" in query:
                     return (query, renamed, directory, move_directory)
-
+    return "Empty"
