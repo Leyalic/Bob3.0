@@ -43,8 +43,6 @@ def al_pre_outbound(test, date, year, query, renamed, aid_year_match):
     if not os.path.isdir(directory):
         os.makedirs(directory)
 
-    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
-
     year = year[2:]
 
     move_directory = "Alternative Loan Reports"
@@ -59,45 +57,59 @@ def al_pre_outbound(test, date, year, query, renamed, aid_year_match):
         if True:
         #for query in os.listdir("."):
             if query.startswith("UUFA_ALR_110_CHNG_PDG_TRANS"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_CL_APP_RSPNS_ERR"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LN_FA907_1_REVISE"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LN_FA907_2_REVISE"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LN_SENT_NO_RESP"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LN_EFT_DETAIL_ERR"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LN_EFT_DT_LNDR_ERR"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LOAN_ORIG_ACAD_LVL") and (year in query[:-8]) :
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LN_ORIG_EDIT_ERR"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LOAN_ORIG_FA_LOAD") and (year in query[:-8]) :
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK") and (year in query[:-8]) :
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LOAN_ORIG_SPLT_CDS") and (year in query[:-8]) :
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LN_ORIG_VLOAN_RSN"):
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
 
             if query.startswith("UUFA_ALR_LOAN_SPC_NEED_OVWD") and (year in query[:-8]) :
+                move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                 return (query, renamed, directory, move_directory)
     else:
         if True:
@@ -105,45 +117,59 @@ def al_pre_outbound(test, date, year, query, renamed, aid_year_match):
             if toggle:
             #if(year not in query_name.split("-")[0]) and (str(int(year)-1) not in query_name.split("-")[0]):
                 if query.startswith("UUFA_ALR_110_CHNG_PDG_TRANS"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_CL_APP_RSPNS_ERR"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LN_FA907_1_REVISE"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LN_FA907_2_REVISE"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LN_SENT_NO_RESP"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LN_EFT_DETAIL_ERR"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LN_EFT_DT_LNDR_ERR"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LOAN_ORIG_ACAD_LVL") :
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LN_ORIG_EDIT_ERR"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LOAN_ORIG_FA_LOAD") :
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK") :
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LOAN_ORIG_SPLT_CDS") :
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LN_ORIG_VLOAN_RSN"):
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
 
                 if query.startswith("UUFA_ALR_LOAN_SPC_NEED_OVWD") :
+                    move_orig(orig_doc, orig_docx, "ALT Loan ORIG 20" + year, aid_year)
                     return (query, renamed, directory, move_directory)
     return "Empty"
     #if not test:

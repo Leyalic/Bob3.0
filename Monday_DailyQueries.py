@@ -40,7 +40,7 @@ def do_monday_weeklies(test, date, year, query, renamed, aid_year_match):
     year = year[2:]
 
     move_directory = "Weekly Reports"
-    pack_directory = "Weekly Reports"
+    pack_directory = "Packaging Reports"
     disb_directory = "Weekly Reports"
     other_directory = "Weekly Reports"
 

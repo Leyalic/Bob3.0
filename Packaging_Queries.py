@@ -29,7 +29,7 @@ def do_packaging_queries(test, date, year, query, renamed, aid_year_match):
 
     year = year[2:]
 
-    move_directory = "Scholarship Reports"
+    move_directory = "Packaging Reports"
 
     toggle = True
 

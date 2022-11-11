@@ -22,7 +22,7 @@ def do_2nd_ldr(test, date, year, query, renamed, aid_year_match):
 
     year = year[2:]
 
-    move_directory = "Pell Reports"
+    move_directory = "Financial Aid Reports"
 
     toggle = True
 

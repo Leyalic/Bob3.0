@@ -112,6 +112,9 @@ def do_budget_queries(test, date, year, query, renamed, aid_year_match):
 
             if "BR_ACAD_LVLS_NOT_SYNC" in query and (year in query[:-8]) :
                 return (query, renamed, directory, move_directory)
+
+            if "UUFA_BR_COA_ONLINE" in query:
+                return (query, renamed, directory, move_directory)
                 
     else:
         if True:
@@ -188,6 +191,8 @@ def do_budget_queries(test, date, year, query, renamed, aid_year_match):
                     return (query, renamed, directory, move_directory)
 
                 if "BR_ACAD_LVLS_NOT_SYNC" in query  :
+                    return (query, renamed, directory, move_directory)
+                if "UUFA_BR_COA_ONLINE" in query:
                     return (query, renamed, directory, move_directory)
     return "Empty"
  

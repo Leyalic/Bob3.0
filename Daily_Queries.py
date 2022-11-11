@@ -43,6 +43,7 @@ def do_dailies(test, date, year, query, renamed, aid_year_match):
     year = year[2:]
 
     move_directory = "Daily Reports"
+    move_pell_directory = "Pell Reports"
 
     toggle = True
 
@@ -246,7 +247,7 @@ def do_dailies(test, date, year, query, renamed, aid_year_match):
             #    do_query(query, date + " PELL RPKG Var Flag 2.xls", pell_directory,
             #             null_mail.attachments)
             elif "PELL_RPKG_VAR_FLAG_2" in query :
-                return(query, renamed, pell_directory, move_directory)
+                return(query, renamed, pell_directory, move_pell_directory)
 
             if "IL_3RD_PARTY_EXCEPT" in query :
                 return (query, renamed, archive_directory, move_directory)
