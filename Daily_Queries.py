@@ -1,5 +1,4 @@
-# Daily Queries - to be modified based on AY and remove attachments
-# to be called in MAIN
+# Daily Queries 
 import os
 
 def do_dailies(test, date, year, query, renamed):
@@ -33,11 +32,16 @@ def do_dailies(test, date, year, query, renamed):
     if not os.path.isdir(refund_directory):
         os.makedirs(refund_directory)
 
-    year = year[2:]
-
     move_directory = "Daily Reports"
     move_pell_directory = "Pell Reports"
 
+    # FORMAT: return (query, renamed, archive_directory, UOSFA_folder)
+    # query: The original file name
+    # renamed: The name the file should have after being moved
+    # archive_directory: The folder the file will be copied to
+    # UOSFA_folder: The name of the folder the renamed file should be moved to
+    # - (eg. "Budget Reports", "SAP Reports", "Unknown Reports") 
+    # - put "None" if it shouldn't be moved to a folder in 'O:/UOSFA Reports/'
 
     if "IL_ATHLETE_OVERAWARD" in query :
         return (query, renamed, archive_directory, move_directory) 

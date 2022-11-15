@@ -1,11 +1,7 @@
-# ATB, FBILL, 3C Queries - to be modified
-# to be called in main
+# ATB, FBILL, 3C Queries
 import os
 
-def do_atb_fb_3c_queries(test, date, year, query, renamed):
-    #global aid_year
-    #year = "23"
-    #aid_year = "20" + str(int(year) - 1) + "-20" + year
+def do_atb_fb_3c_queries(test, query, renamed):
 
     if test:
         directory = os.path.realpath(os.path.join('C:/Testing Bob/QUERIES/3C Queries'))
@@ -14,58 +10,58 @@ def do_atb_fb_3c_queries(test, date, year, query, renamed):
         directory = os.path.realpath(os.path.join('O:/Systems/QUERIES/3C Queries'))
         atb_directory = os.path.realpath(os.path.join('O:/Systems/QUERIES/ATB'))
 
-    # the list 'my_path' should be populated with the FOLDER variables above.
     if not os.path.isdir(directory):
         os.makedirs(directory)
     if not os.path.isdir(atb_directory):
         os.makedirs(atb_directory)
 
-    year = year[2:]
-
     move_directory = "Daily Reports"
-    other_directory = "Daily Reports"
+    atb_move_directory = "Daily Reports"
 
-    # Change File_Name to be file as it is received and _new_file_name to what
-    # the new file should be.  Prefix date
-    # will be added.
-    if True:
-    #for query in os.listdir("."):
-        if ("UUFA_ADD_FDLP" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_ADD_FGLO" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_ADD_FHST" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_ADD_FMPN" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_ADD_FNON" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_ADD_FTYN" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_ADD_FULO" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_ADD_FLPR" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_COMPLETE_FDLP" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_COMPLETE_FGLO" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_COMPLETE_FHST" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_COMPLETE_FMPN" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_COMPLETE_FNON" in query) :
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_COMPLETE_FULO" in query):
-            return (query, renamed, directory, move_directory)
-        if ("UUFA_HS_06_AFTER_ATB" in query):
-            return (query, renamed, atb_directory, other_directory)
-        if ("UUFA_HS_04_AFTER_ATB" in query):
-            return (query, renamed, atb_directory, other_directory)
-        if ("UUFA_GED_07_AFTER_ATB" in query):
-            return (query, renamed, atb_directory, other_directory)
-        if ("UUFA_ATB_ISIR_NOT_MATCH" in query):
-            return (query, renamed, atb_directory, other_directory)
-        if ("UUFA_ATB_SEQUENCE_DIFFERENCE" in query):
-            return (query, renamed, atb_directory, other_directory)
+    # FORMAT: return (query, renamed, archive_directory, UOSFA_folder)
+    # query: The original file name
+    # renamed: The name the file should have after being moved
+    # archive_directory: The folder the file will be copied to
+    # UOSFA_folder: The name of the folder the renamed file should be moved to
+    # - (eg. "Budget Reports", "SAP Reports", "Unknown Reports") 
+    # - put "None" if it shouldn't be moved to a folder in 'O:/UOSFA Reports/'
+
+    if ("UUFA_ADD_FDLP" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_ADD_FGLO" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_ADD_FHST" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_ADD_FMPN" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_ADD_FNON" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_ADD_FTYN" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_ADD_FULO" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_ADD_FLPR" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_COMPLETE_FDLP" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_COMPLETE_FGLO" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_COMPLETE_FHST" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_COMPLETE_FMPN" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_COMPLETE_FNON" in query) :
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_COMPLETE_FULO" in query):
+        return (query, renamed, directory, move_directory)
+    if ("UUFA_HS_06_AFTER_ATB" in query):
+        return (query, renamed, atb_directory, atb_move_directory)
+    if ("UUFA_HS_04_AFTER_ATB" in query):
+        return (query, renamed, atb_directory, atb_move_directory)
+    if ("UUFA_GED_07_AFTER_ATB" in query):
+        return (query, renamed, atb_directory, atb_move_directory)
+    if ("UUFA_ATB_ISIR_NOT_MATCH" in query):
+        return (query, renamed, atb_directory, atb_move_directory)
+    if ("UUFA_ATB_SEQUENCE_DIFFERENCE" in query):
+        return (query, renamed, atb_directory, atb_move_directory)
     return "Empty"
