@@ -28,40 +28,59 @@ def do_atb_fb_3c_queries(test, query, renamed):
 
     if ("UUFA_ADD_FDLP" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_ADD_FGLO" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_ADD_FHST" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_ADD_FMPN" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_ADD_FNON" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_ADD_FTYN" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_ADD_FULO" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_ADD_FLPR" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_COMPLETE_FDLP" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_COMPLETE_FGLO" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_COMPLETE_FHST" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_COMPLETE_FMPN" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_COMPLETE_FNON" in query) :
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_COMPLETE_FULO" in query):
         return (query, renamed, directory, move_directory)
+
     if ("UUFA_HS_06_AFTER_ATB" in query):
         return (query, renamed, atb_directory, atb_move_directory)
+
     if ("UUFA_HS_04_AFTER_ATB" in query):
         return (query, renamed, atb_directory, atb_move_directory)
+
     if ("UUFA_GED_07_AFTER_ATB" in query):
         return (query, renamed, atb_directory, atb_move_directory)
+
     if ("UUFA_ATB_ISIR_NOT_MATCH" in query):
         return (query, renamed, atb_directory, atb_move_directory)
+
     if ("UUFA_ATB_SEQUENCE_DIFFERENCE" in query):
         return (query, renamed, atb_directory, atb_move_directory)
-    return "Empty"
+
+    return "Empty" #Leave as last line

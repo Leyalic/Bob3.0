@@ -172,9 +172,9 @@ def do_dailies(test, date, year, query, renamed):
     if query.startswith("UUFA_IL_FHST_I_HST_COMPLETE") :
         return (query, renamed, archive_directory, move_directory)
 
-        #if query.startswith("ussf0034"): # Leave this one commented out?
-        #    do_query(query, date + " " + query, refund_directory,
-        #             aehjkkt_mail.attachments) 
+    #if query.startswith("ussf0034"): # Leave this one commented out?
+    #    do_query(query, date + " " + query, refund_directory,
+    #             aehjkkt_mail.attachments) 
 
     if query.startswith("UUFA_REFUND_HOLDS"):
         return (query, renamed, refund_directory, move_directory)
@@ -260,6 +260,6 @@ def do_dailies(test, date, year, query, renamed):
     if "IL_ISIR_SSN_MISMATCH" in query :
         return (query, renamed, disb_directory, move_directory)
 
-    return "Empty"
+    return "Empty" #Leave as last line
 
 

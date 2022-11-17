@@ -96,4 +96,4 @@ def do_end_of_term_queries(test, year, query, renamed):
     if "EOT_WUE_ACAD_PROG_REV" in query:
         return (query, renamed, directory, move_directory)             
 
-    return "Empty"
+    return "Empty" #Leave as last line

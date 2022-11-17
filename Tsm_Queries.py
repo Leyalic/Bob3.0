@@ -51,4 +51,4 @@ def do_tsm_queries(test, query, renamed):
     if ("_NSLDS_VAR_FLAG9_UG" in query) :
         return (query, renamed, directory, move_directory)
 
-    return "Empty"
+    return "Empty" #Leave as last line

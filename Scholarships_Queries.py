@@ -32,7 +32,7 @@ def do_daily_scholarships(test, year, query, renamed):
     if query.startswith("UUFA_SCHOLAR_AUTH_NOT_DISB") :
         return (query, renamed, directory, move_directory)
 
-    return "Empty"
+    return "Empty" #Leave as last line
  
 
 # Weekly Scholarships Queries
@@ -135,4 +135,4 @@ def do_weekly_scholarships(test, year, query, renamed):
     if ("WS_SCHOLAR_STATUS" in query):
             return (query, renamed, directory, move_directory)
 
-    return "Empty"
+    return "Empty" #Leave as last line

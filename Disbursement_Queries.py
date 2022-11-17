@@ -15,8 +15,6 @@ def do_disb_queries(test, date, year, query, renamed):
     if not os.path.isdir(directory):
         os.makedirs(directory)
 
-    year = year[2:]
-
     move_directory = "Daily Reports"
     
     if query.startswith("UUFA_DQ_AUTHORIZED_NOT_DISB"):
@@ -37,7 +35,7 @@ def do_disb_queries(test, date, year, query, renamed):
     if ("_DQ_DISB_TOTALS") in query:
         return (query, renamed, directory, move_directory)
 
-    if query.startswith("UUFA_DQ_FALL" + year) :
+    if query.startswith("UUFA_DQ_FALL") :
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_DQ_FALL_SPRING"):
@@ -73,9 +71,6 @@ def do_disb_queries(test, date, year, query, renamed):
     if query.startswith("UUFA_DQ_SF_ITEM_TYPE_ERROR"):
         return (query, renamed, directory, move_directory)
 
-    if query.startswith("UUFA_DQ_TEACH_GRANT" + str(int(year) - 1)):
-        return (query, renamed, directory, move_directory)
-
     if query.startswith("UUFA_DQ_TEACH_GRANT"):
         return (query, renamed, directory, move_directory)
 
@@ -91,5 +86,5 @@ def do_disb_queries(test, date, year, query, renamed):
     if query.startswith("UUFA_DQ_PELL_ACPT_GR8_DISB") :
         return (query, renamed, directory, move_directory)
 
-    return "Empty"
+    return "Empty" #Leave as last line
 

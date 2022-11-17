@@ -96,7 +96,7 @@ def do_budget_queries(test, date, year, query, renamed):
     if "UUFA_BR_COA_ONLINE" in query:
         return (query, renamed, directory, move_directory)
 
-    return "Empty"
+    return "Empty" #Leave as last line
 
 
 
@@ -268,4 +268,4 @@ def do_budget_test_queries(test, date, year, query, renamed):
     if query.startswith("UUFA_BUDGET_20" + year + "_UG_NURSING"):
         return (query, renamed, directory, move_directory)
                 
-    return "Empty"
+    return "Empty" #Leave as last line
