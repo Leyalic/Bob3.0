@@ -127,11 +127,11 @@ class BobWindow(tk.Frame):
             global year_valid
             #global term_valid
             if year_valid:
-                top= Toplevel(rootWindow)
-                top.geometry("750x250")
-                top.title("Run Window")
-                Label(top, text= "Program running, please do not close the window", font=('Helvetica 18 bold')).place(x=100,y= 80)
-                Do_Queries_Functions.run(self.t1.get())
+                #top= Toplevel(rootWindow)
+                #top.geometry("750x250")
+                #top.title("Run Window")
+                #Label(top, text= "Program running, please do not close the window", font=('Helvetica 18 bold')).place(x=100,y= 80)
+                Do_Queries_Functions.run(self.t1.get(), rootWindow)
             else:
                 self.bell()
                 prev = self.focus_get()
