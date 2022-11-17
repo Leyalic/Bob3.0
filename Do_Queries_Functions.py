@@ -1,5 +1,6 @@
 # Created by Joshua Hardy and mmason
 from asyncio.windows_events import NULL
+from genericpath import isfile
 import os
 import re
 import openpyxl
@@ -8,6 +9,7 @@ import time
 import shutil
 import tkinter
 from tkinter import filedialog
+from tkinter import Toplevel
 from pathlib import Path
 
 {}
@@ -45,6 +47,9 @@ unknown_list = []
 current_aid_year = ""
 folder_path = Path()
 disbursement_date = datetime.datetime.min
+
+rootWindow = ""
+select_window = ""
 
 aid_year_regex = ["Aid[\s]?Y(ea)?r"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
@@ -117,18 +122,22 @@ def rename_file(name, new_name, i=2):
     this_new_name = os.path.realpath(new_name)
     dot_index = this_new_name.find(".")
     num = i
+    renamed = this_new_name
     try:
         os.rename(this_name, this_new_name)
     except WindowsError as e:
         try:
             final_name = this_new_name[:dot_index] + " (" + str(num) + ")" + this_new_name[dot_index:]
             os.rename(this_name, final_name)
+            renamed = final_name
         except WindowsError:
             rename_file(this_name, this_new_name, num + 1)
+    finally:
+        return renamed
             
 
 # The old move method from DoQueries *modified*
-def move_to_folder(name, to_directory):
+def move_to_folder(name, to_directory, num=2):
     move_name = name
     move_directory = to_directory
     try:
@@ -137,12 +146,16 @@ def move_to_folder(name, to_directory):
         print(e)
     except shutil.Error:
         print ("Already a file with the name:" + name + "at location.")
+        dot_index = move_name.find(".")
+        final_name = move_name[:dot_index] + " (" + str(num) + ")" + move_name[dot_index:]
+        renamed = rename_file(name, final_name, num+1)
+        move_to_folder(renamed, to_directory, num+1)
     except IOError as e:
         print(e)
         pass
 
 # Copies file to folder without removing it
-def copy_to_folder(name, to_directory):
+def copy_to_folder(name, to_directory, num=2):
     copy_name = name
     copy_directory = to_directory
     try:
@@ -151,17 +164,19 @@ def copy_to_folder(name, to_directory):
         print(e)
     except shutil.Error:
         print ("Already a file with the name:" + name + "at location.")
+        renamed = rename_file(name, name, num+1)
+        copy_to_folder(renamed, to_directory, num+1)
     except IOError as e:
         print(e)
         pass
 
 # The old do query method from DoQueries without attach lists *modified*
-def do_query(name, new_name, legacy_archive, UOSFA_folder, i=2):
+def do_query_old(name, new_name, legacy_archive, UOSFA_folder, i=2):
     global folder_path
     global UOSFA_directory
 
     this_name = str(folder_path / Path(name))
-    this_new_name = Path(new_name)
+    this_new_name = str(folder_path / Path(new_name))
     if test:
         this_destination = str(test_UOSFA_directory / UOSFA_folder)
     else:       
@@ -169,24 +184,60 @@ def do_query(name, new_name, legacy_archive, UOSFA_folder, i=2):
 
     num = i
     if num == 2:
-        rename_file(this_name, str(folder_path / this_new_name))
-        this_name = str(folder_path / this_new_name)
-        if UOSFA_folder is "None":
-            move_to_folder(this_name, legacy_archive)
+        renamed = rename_file(this_name, this_new_name, num)
+        this_name = str(folder_path / Path(this_new_name))
+        if UOSFA_folder == "None":
+            move_to_folder(this_name, legacy_archive, i)
         else:
-            copy_to_folder(this_name, legacy_archive)        
-            move_to_folder(this_name, this_destination)
+            copy_to_folder(this_name, legacy_archive, i)        
+            move_to_folder(this_name, this_destination, i)
 
-# The do query method that only makes one archive copy
-def do_query_unknown(name, new_name, destination, i=2):
-    global folder_path
-    this_name = str(folder_path / Path(name))
-    this_new_name = Path(new_name)
-    num = i
-    if num == 2:
-        rename_file(this_name, str(folder_path / this_new_name))
-        this_name = str(folder_path / this_new_name)
-        move_to_folder(this_name, destination)
+# Renames file to ensure no duplicates at desired location
+def rename_no_duplicates(folder_path, renamed):
+    filepath = str(folder_path / Path(renamed))
+    while(isfile(filepath)):
+        paren_index = filepath.find("(")
+        if paren_index > -1:
+            right_paren_index = filepath.find(")")
+            dup_num = filepath[paren_index + 1:right_paren_index]
+            dup_num = str(int(dup_num) + 1)           
+            filepath = filepath[:paren_index+1] + dup_num + filepath[right_paren_index:]
+        else:
+            dot_index = filepath.find(".")
+            filepath = filepath[:dot_index] + " (2)" + filepath[dot_index:]
+    return filepath
+
+# A new do query method made from scratch for better handling of duplicate files
+def do_query(name, renamed, legacy_archive, UOSFA_folder):
+
+    current_filepath = str(folder_path / Path(name))
+
+    if test:
+        UOSFA_destination = str(test_UOSFA_directory / UOSFA_folder)
+    else:       
+        UOSFA_destination = str(UOSFA_directory / UOSFA_folder)
+
+    if UOSFA_folder == "None":
+        legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
+        shutil.move(current_filepath, legacy_filepath)
+    else:
+        legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
+        UOSFA_filepath = rename_no_duplicates(UOSFA_destination, renamed)
+        shutil.copy(current_filepath, legacy_filepath)
+        shutil.move(current_filepath, UOSFA_filepath)    
+
+# The do query method for manually selected folders
+def do_query_unknown(name, renamed, destination):
+    
+    current_filepath = str(folder_path / Path(name))
+
+    if test:
+        UOSFA_destination = str(test_UOSFA_directory / destination)
+    else:       
+        UOSFA_destination = str(UOSFA_directory / destination)
+
+    destination_filepath = rename_no_duplicates(UOSFA_destination, renamed)
+    shutil.move(current_filepath, destination_filepath)
         
 def new_name(name, year):
     hay_result = has_aid_year(name)
@@ -246,66 +297,66 @@ def move_files(filename, year, match):
 
 # Daily Queries
     if info == "Empty":
-        info = Daily_Queries.do_dailies(test, date, year, filename, renamed, match)
+        info = Daily_Queries.do_dailies(test, date, year, filename, renamed)
 # Monday Weekly Queries
     if info == "Empty": #and filename.startswith("UUFA_WR"):
-        info = Monday_DailyQueries.do_monday_weeklies(test, date, year, filename, renamed, match)
+        info = Monday_DailyQueries.do_monday_weeklies(test, date, year, filename, renamed)
 # Budget Queries
     if info == "Empty": #and "UUFA_BR" in filename or "UUFA_BR_COA" in filename:
-        info = Budget_Queries.do_budget_queries(test, date, year, filename, renamed, match)
+        info = Budget_Queries.do_budget_queries(test, date, year, filename, renamed)
 # Packaging Queries
     if info == "Empty": #and filename.startswith("UUFA_PRT_ACAD_PROG_REVIEW"):
-        info = Packaging_Queries.do_packaging_queries(test, date, year, filename, renamed, match)
+        info = Packaging_Queries.do_packaging_queries(test, date, year, filename, renamed)
 # Monthly Queries
     if info == "Empty": #and "MR_PELL_SSN_MISMATCH" in filename:
-        info = Monthly_Queries.do_monthlies(test, date, current_aid_year, filename, renamed, match)
+        info = Monthly_Queries.do_monthlies(test, date, current_aid_year, filename, renamed)
 # Disbursement Queries
     if info == "Empty": #and filename.startswith("UUFA_DQ_AUTHORIZED_NOT_DISB"):
-        info = Disbursement_Queries.do_disb_queries(test, date, year, filename, renamed_disb, match, disbursement_date)
+        info = Disbursement_Queries.do_disb_queries(test, date, year, filename, renamed_disb)
 #2nd LDR Queries
     if info == "Empty": #and filename.startswith("UUFA_PRT_PELL_ELG_NO_PELL"):
-        info = Second_LDR.do_2nd_ldr(test, date, year, filename, renamed, match)
+        info = Second_LDR.do_2nd_ldr(test, year, filename, renamed)
 # End of Term Queries
     if info == "Empty": #and filename.startswith("UUFA_EOT_ACAD_PLAN_RVW"):
-        info = EndOfTerm_Queries.do_end_of_term_queries(test, date, year, filename, renamed, match)
+        info = EndOfTerm_Queries.do_end_of_term_queries(test, year, filename, renamed)
 # Day After LDR Queries
     if info == "Empty": #and filename.startswith("UUFA_LDR_MIN_ENROLLMENT_ATH"):
-        info = Day_AfterLDR.do_day_after_ldr(test, date, year, filename, renamed, match)
+        info = Day_AfterLDR.do_day_after_ldr(test, year, filename, renamed)
 # Direct Loans Pre-Outbound Queries
-#    if info == "Empty": #and "DLR_LOAN_ORIG_EDIT_ERR" in filename:
-#        info = Direct_Loan.dl_pre_outbound(test, date, year, filename, renamed, match)
+    if info == "Empty": #and "DLR_LOAN_ORIG_EDIT_ERR" in filename:
+        info = Direct_Loan.dl_pre_outbound(test, date, year, filename, renamed)
 ## Alternative Loan Pre-Outbound Queries
-#    if info == "Empty": #and filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
-#        info = Alt_Loan_Queries.al_pre_outbound(test, date, year, filename, renamed, match)
+    if info == "Empty": #and filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
+        info = Alt_Loan_Queries.al_pre_outbound(test, date, year, filename, renamed)
 # Pre-Repackaging Queries
     if info == "Empty": #and filename.startswith("UUFA_PP"):
-        info = PrePackaging_Queries.do_pre_repackaging(test, date, year, filename, renamed, match)
+        info = PrePackaging_Queries.do_pre_repackaging(test, year, filename, renamed)
 # Mid-Repackaging Queries
     if info == "Empty": #and filename.startswith("UUFA_MP"):
-        info = Mid_Repack_Queries.do_mid_repack_queries(test, date, year, filename, renamed)
+        info = Mid_Repack_Queries.do_mid_repack_queries(test, year, filename, renamed)
 # After Repackaging Queries
     if info == "Empty": #and filename.startswith("UUFA_AP"):
-        info = After_Repack_Queries.do_after_repackaging(test, date, year, filename, renamed)
+        info = After_Repack_Queries.do_after_repackaging(test, year, filename, renamed)
 # Daily Scholarships Queries
     if info == "Empty": #and filename.startswith("UUFA_SCHOLAR_DISB_ZERO"):
-        info = Scholarships_Queries.do_daily_scholarships(test, date, year, filename, renamed)
+        info = Scholarships_Queries.do_daily_scholarships(test, year, filename, renamed)
 # Weekly Scholarships Queries
     if info == "Empty": #and ("UUFA_WS" in filename):
-        info = Scholarships_Queries.do_weekly_scholarships(test, date, year, filename, renamed, match)
+        info = Scholarships_Queries.do_weekly_scholarships(test, year, filename, renamed)
 # Budget Testing Queries
     if info == "Empty": #and filename.startswith("UUFA_BUDGET_20"):
-        info = Budget_Queries.do_budget_test_queries(test, date, year, filename, renamed, match)
+        info = Budget_Queries.do_budget_test_queries(test, date, year, filename, renamed)
 # ATB and 3C Queries
     if info == "Empty": #and "UUFA_ATB" in filename:
-        info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(test, date, year, filename, renamed)
+        info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(test, filename, renamed)
 # Remove extra files 
     if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
-        os.remove(filename)
+        os.remove(folder_path / Path(filename))
         print("Removed " + filename)
         info = "Removed"
 # Transfer Student Monitoring
     if info == "Empty": #and "_NSLDS" in filename:
-        info = Tsm_Queries.do_tsm_queries(test, date, year, filename, renamed, match)
+        info = Tsm_Queries.do_tsm_queries(test, filename, renamed)
 
 # Unknown File
     if info == "Empty":
@@ -317,7 +368,8 @@ def move_files(filename, year, match):
 
 # Asks user to select a folder
 def folder_select_popup(filename):
-    root = tkinter.Tk()
+    global select_window
+    select_window = Toplevel(rootWindow)
     prompt = "The following file could not be sorted. Please select a destination folder."
     options = [
                 "Alternative Loan Reports",
@@ -325,33 +377,53 @@ def folder_select_popup(filename):
                 "Daily Reports",
                 "Direct Loan Reports",
                 "External Award Reports",
+                "Financial Aid Reports",
                 "Monthly Reports",
+                "Packaging Reports",
                 "Pell Reports",
+                "SAP Reports",
                 "Scholarship Reports",
-                "Weekly Reports"
-                "Unknown Reports"
+                "Unknown Reports",
+                "Weekly Reports"              
               ]
-    tkinter.Label(root, text=prompt, padx=10, pady=5).pack()
-    tkinter.Label(root, text=filename, fg='#00f', padx=10).pack()
+    tkinter.Label(select_window, text=prompt, padx=10, pady=5).pack()
+    tkinter.Label(select_window, text=filename, fg='#00f', padx=10).pack()
     v = tkinter.IntVar()
     for i, option in enumerate(options):
-        tkinter.Radiobutton(root, text=option, variable=v, value=i).pack(anchor="w")
-    tkinter.Button(text="Submit", command=root.destroy).pack()
-    root.mainloop()
-    return options[v.get()]
+        tkinter.Radiobutton(select_window, text=option, variable=v, value=i).pack(anchor="w")
+    tkinter.Button(select_window, text="Submit", command=lambda: handle_selection(options[v.get()], filename)).pack()
+    select_window.mainloop()
+
+def notify_done():
+    pass
+
+def handle_selection(UOSFA_folder, filename):
+    global select_window
+    select_window.destroy()
+    if test:
+        folder = test_UOSFA_directory / Path(UOSFA_folder)
+        renamed = new_name(filename, current_aid_year)
+        do_query_unknown(filename, renamed, folder)
+    else:
+        folder = UOSFA_directory / Path(UOSFA_folder)
+        renamed = new_name(filename, current_aid_year)
+        do_query_unknown(filename, renamed, folder)
+    done = handle_unknown_files()
+    if(done):
+        notify_done()
+        pass
+
 
 # Prompt user to select folder for unknown files
 def handle_unknown_files():
     global unknown_list
+    done = True
     for filename in unknown_list:
-        if test:
-            folder = test_UOSFA_directory / folder_select_popup(filename)
-            new_name = date + filename + current_aid_year;
-            do_query_unknown(filename, new_name, folder)
-        else:
-            folder = UOSFA_directory / folder_select_popup(filename)
-            new_name = date + filename + current_aid_year;
-            do_query_unknown(filename, new_name, folder)
+        done = False
+        unknown_list.remove(filename)
+        folder_select_popup(filename)
+    return done
+        
 
 
 def aid_year_match(year):
@@ -403,7 +475,7 @@ def find_aid_year(filename):
             else:
                 even_aid_years.append(str(filestring))
                 move_files(filestring, current_aid_year, True)
-            print("Couldn't find year of " + filestring)
+            #print("Couldn't find year of " + filestring)
         else:
             if is_odd_year(current_aid_year):
                 odd_aid_years.append(str(filestring))
@@ -428,7 +500,7 @@ def sort_files():
             pFilename = Path(filename)
             find_aid_year(pFilename)
         if len(unknown_list) > 0:
-                handle_unknown_files()
+            handle_unknown_files()
     else:
         folder_path = Path(os.getcwd())
         for filename in os.listdir("."):
@@ -436,14 +508,18 @@ def sort_files():
             find_aid_year(pFilename)
 
         if len(unknown_list) > 0:
-            handle_unknown_files()
+            #handle_unknown_files()
+            pass
 
 
 # User Input - Initialize Aid year and disbursement date
-def initialize(year):
+def initialize(year, root):
     global current_aid_year
     global STerm
     global disbursement_date
+    global rootWindow
+
+    rootWindow = root
 
     current_aid_year = year
     today = datetime.date.today()
@@ -456,14 +532,15 @@ def initialize(year):
     if test:
         print("Disbursement Date: " + disbursement_date)
 
-def run(year):
+def run(year, root):
     if test:
-        initialize(year)
+        initialize(year, root)
         sort_files()
         output_sorted_files()
+        print("Done")
         
     else:
-        initialize(year)
+        initialize(year, root)
         sort_files()
         
 
