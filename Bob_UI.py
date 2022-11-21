@@ -1,6 +1,5 @@
 #Created by Iman Essaghir
 
-from asyncio.windows_events import NULL
 import tkinter as tk
 from tkinter import *
 import tkinter.font as font
@@ -18,12 +17,113 @@ titleLabel.pack()
 img=PhotoImage(file='uosfa.png')
 Label(rootWindow,image=img).pack()
 
-rootWindow.geometry("850x750")
+rootWindow.geometry("850x550")
+
+unknown_list = []
+
+select_window = None
+
+folder_option = ""
+
+aid_year = ""
 
 #Adding widgets
 
 class BobWindow(tk.Frame):
     
+    def handle_selection(option):
+        global folder_option
+        global select_window
+
+        folder_option = option
+        select_window.destroy()
+
+
+    def folder_select_popup(filename):
+        global select_window
+        select_window = Toplevel(rootWindow)
+        prompt = "The following file could not be sorted. Please select a destination folder."
+        options = [
+                    "Alternative Loan Reports",
+                    "Budget Reports",
+                    "Daily Reports",
+                    "Direct Loan Reports",
+                    "External Award Reports",
+                    "Financial Aid Reports",
+                    "Monthly Reports",
+                    "Packaging Reports",
+                    "Pell Reports",
+                    "SAP Reports",
+                    "Scholarship Reports",
+                    "Unknown Reports",
+                    "Weekly Reports"              
+                  ]
+        tk.Label(select_window, text=prompt, padx=10, pady=5).pack()
+        tk.Label(select_window, text=filename, fg='#00f', padx=10).pack()
+        v = tk.IntVar()
+        for i, option in enumerate(options):
+            tk.Radiobutton(select_window, text=option, variable=v, value=i).pack(anchor="w")
+        tk.Button(select_window, text="Submit", command=lambda: BobWindow.handle_selection(options[v.get()])).pack()
+        #select_window.mainloop()
+        select_window.title("Select Folder")
+        return select_window
+
+
+    # Prompt user to select folder for unknown files
+    def handle_unknown_files():
+        global unknown_list
+        global folder_option
+
+        done = True
+        while len(unknown_list) > 0:
+            done = False
+            folder_option = ""
+
+            # Ask user to select folder
+            filename = unknown_list[0]                     
+            wind = BobWindow.folder_select_popup(filename)
+            rootWindow.wait_window(wind)
+
+            if folder_option == "":
+                unknown_list.remove(filename)
+                continue
+
+            print("Moved to " + folder_option)
+
+            # Move file to selected folder
+            renamed = Do_Queries_Functions.new_name(filename, aid_year)           
+            Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option)
+            unknown_list.remove(filename)
+
+        print("All Unknown Files Handled")
+
+        return done
+
+    def open_popup(self):
+        global unknown_list
+        global aid_year
+        if year_valid:
+            #top= Toplevel(rootWindow)
+            #top.geometry("750x250")
+            #top.title("Run Window")
+            #Label(top, text= "Program running, please do not close the window", font=('Helvetica 18 bold')).place(x=100,y= 80)
+            aid_year = self.t1.get()
+            unknown_list = Do_Queries_Functions.run(self.t1.get(), rootWindow)
+
+            if len(unknown_list) > 0:
+                # Disable all window input here
+                self.exit_Button["state"] = "disabled"
+                BobWindow.handle_unknown_files()
+                # Re-enable all window input here
+                self.exit_Button["state"] = "normal"
+                print("Process Completed")
+
+        else:
+            rootWindow.bell()
+            prev = self.focus_get()
+            self.b1.focus()
+            prev.focus()
+            self.aid_warn_label.config(text = "Aid Year must be provided")
 
     def validate_aid_year(self, d, i, P, s, S, v, V, W):     
         global year_valid
@@ -54,35 +154,6 @@ class BobWindow(tk.Frame):
         elif V == "focusin":
             return True
         
-    def validate_STerm(self, d, i, P, s, S, v, V, W): 
-        global year_valid
-        global term_valid
-        if V == "key":
-            if P.isnumeric():
-                if len(P) == 4:
-                    term_valid = True
-                else:
-                    term_valid = False
-            else:
-                term_valid = False
-            return True
-        elif V == "focusout":
-            if P.isnumeric():
-                if len(P) == 4:
-                    self.term_warn_label.config(text = "")
-                    term_valid = True
-                    return True
-                else:
-                    self.term_warn_label.config(text = "STerm must have 4 digits")                  
-                    term_valid = False
-                    return False
-            else:
-                self.term_warn_label.config(text = "STerm must be a number")
-                term_valid = False
-                return False
-        elif V == "focusin":
-            return True
-
 
     def __init__(self, win):
         tk.Frame.__init__(self, win)
@@ -91,65 +162,29 @@ class BobWindow(tk.Frame):
        
         aid_valid = (self.register(self.validate_aid_year),
                 '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
-        term_valid = (self.register(self.validate_STerm),
-                '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
 
         self.t1=Entry(bd=10, validate="all", validatecommand=aid_valid)
         
-        #sTerm = tk.IntVar()
-        #options = ["S", "U", "F"]
-        #self.springTerm=Radiobutton(win, text="Spring", font=("Times New Roman bold", 13), variable=sTerm, value=0)
-        #self.summerTerm=Radiobutton(win, text="Summer", font=("Times New Roman bold", 13), variable=sTerm, value=1)
-        #self.fallTerm=Radiobutton(win, text="Fall", font=("Times New Roman bold", 13), variable=sTerm, value=2)
-
-        #self.t2=Entry(bd=10, validate="all", validatecommand=term_valid)
-
         self.aid_warn_label = Label(win, text="", fg='blue', font=("Times New Roman bold", 13))
         self.aid_warn_label.place(x=570, y=340)
 
-        #self.term_warn_label = Label(win, text="", fg='blue', font=("Times New Roman bold", 13))
-        #self.term_warn_label.place(x=580, y=440)
 
         self.lbl1.place(x=200, y=300)
         self.t1.place(x=600, y=300)
-
-        #self.lbl2.place(x=200, y=400)
-        #self.springTerm.place(x=600, y=400)
-        #self.summerTerm.place(x=600, y=430)
-        #self.fallTerm.place(x=600, y=460)
-
-        #self.t2.place(x=600, y=400)
-       
-       
-        #Next pop up window
-
-        def open_popup():
-            global year_valid
-            #global term_valid
-            if year_valid:
-                #top= Toplevel(rootWindow)
-                #top.geometry("750x250")
-                #top.title("Run Window")
-                #Label(top, text= "Program running, please do not close the window", font=('Helvetica 18 bold')).place(x=100,y= 80)
-                Do_Queries_Functions.run(self.t1.get(), rootWindow)
-            else:
-                self.bell()
-                prev = self.focus_get()
-                self.b1.focus()
-                prev.focus()
+        
                 
 
         #Create a button in the main Window to open the popup
  
-        self.b1=Button(win, text="Run", command=open_popup)
+        self.b1=Button(win, text="Run", bd="4", command=self.open_popup, height="5", width="30")
         self.b1.pack(side=BOTTOM, anchor="center",padx=18, pady=18)
     
-        exit_Button = Button(rootWindow, text="Exit Program", command=rootWindow.quit)
-        exit_Button.pack(side=BOTTOM, anchor="e", padx=8, pady=8)
+        self.exit_Button = Button(rootWindow, text="Exit Program", command=rootWindow.destroy)
+        self.exit_Button.pack(side=BOTTOM, anchor="e", padx=8, pady=8)
 
+        self.winfo_toplevel().title("Bob Window")
    
-        win.mainloop()
-
+        #win.mainloop()
 
 mywin=BobWindow(rootWindow)
 

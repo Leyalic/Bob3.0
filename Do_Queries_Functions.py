@@ -136,61 +136,61 @@ def rename_file(name, new_name, i=2):
         return renamed
             
 
-# The old move method from DoQueries *modified*
-def move_to_folder(name, to_directory, num=2):
-    move_name = name
-    move_directory = to_directory
-    try:
-        shutil.move(move_name, move_directory)
-    except FileNotFoundError as e:
-        print(e)
-    except shutil.Error:
-        print ("Already a file with the name:" + name + "at location.")
-        dot_index = move_name.find(".")
-        final_name = move_name[:dot_index] + " (" + str(num) + ")" + move_name[dot_index:]
-        renamed = rename_file(name, final_name, num+1)
-        move_to_folder(renamed, to_directory, num+1)
-    except IOError as e:
-        print(e)
-        pass
+## The old move method from DoQueries *modified*
+#def move_to_folder(name, to_directory, num=2):
+#    move_name = name
+#    move_directory = to_directory
+#    try:
+#        shutil.move(move_name, move_directory)
+#    except FileNotFoundError as e:
+#        print(e)
+#    except shutil.Error:
+#        print ("Already a file with the name:" + name + "at location.")
+#        dot_index = move_name.find(".")
+#        final_name = move_name[:dot_index] + " (" + str(num) + ")" + move_name[dot_index:]
+#        renamed = rename_file(name, final_name, num+1)
+#        move_to_folder(renamed, to_directory, num+1)
+#    except IOError as e:
+#        print(e)
+#        pass
 
-# Copies file to folder without removing it
-def copy_to_folder(name, to_directory, num=2):
-    copy_name = name
-    copy_directory = to_directory
-    try:
-        shutil.copy(copy_name, copy_directory)
-    except FileNotFoundError as e:
-        print(e)
-    except shutil.Error:
-        print ("Already a file with the name:" + name + "at location.")
-        renamed = rename_file(name, name, num+1)
-        copy_to_folder(renamed, to_directory, num+1)
-    except IOError as e:
-        print(e)
-        pass
+## Copies file to folder without removing it
+#def copy_to_folder(name, to_directory, num=2):
+#    copy_name = name
+#    copy_directory = to_directory
+#    try:
+#        shutil.copy(copy_name, copy_directory)
+#    except FileNotFoundError as e:
+#        print(e)
+#    except shutil.Error:
+#        print ("Already a file with the name:" + name + "at location.")
+#        renamed = rename_file(name, name, num+1)
+#        copy_to_folder(renamed, to_directory, num+1)
+#    except IOError as e:
+#        print(e)
+#        pass
 
-# The old do query method from DoQueries without attach lists *modified*
-def do_query_old(name, new_name, legacy_archive, UOSFA_folder, i=2):
-    global folder_path
-    global UOSFA_directory
+## The old do query method from DoQueries without attach lists *modified*
+#def do_query_old(name, new_name, legacy_archive, UOSFA_folder, i=2):
+#    global folder_path
+#    global UOSFA_directory
 
-    this_name = str(folder_path / Path(name))
-    this_new_name = str(folder_path / Path(new_name))
-    if test:
-        this_destination = str(test_UOSFA_directory / UOSFA_folder)
-    else:       
-        this_destination = str(UOSFA_directory / UOSFA_folder)
+#    this_name = str(folder_path / Path(name))
+#    this_new_name = str(folder_path / Path(new_name))
+#    if test:
+#        this_destination = str(test_UOSFA_directory / UOSFA_folder)
+#    else:       
+#        this_destination = str(UOSFA_directory / UOSFA_folder)
 
-    num = i
-    if num == 2:
-        renamed = rename_file(this_name, this_new_name, num)
-        this_name = str(folder_path / Path(this_new_name))
-        if UOSFA_folder == "None":
-            move_to_folder(this_name, legacy_archive, i)
-        else:
-            copy_to_folder(this_name, legacy_archive, i)        
-            move_to_folder(this_name, this_destination, i)
+#    num = i
+#    if num == 2:
+#        renamed = rename_file(this_name, this_new_name, num)
+#        this_name = str(folder_path / Path(this_new_name))
+#        if UOSFA_folder == "None":
+#            move_to_folder(this_name, legacy_archive, i)
+#        else:
+#            copy_to_folder(this_name, legacy_archive, i)        
+#            move_to_folder(this_name, this_destination, i)
 
 # Renames file to ensure no duplicates at desired location
 def rename_no_duplicates(folder_path, renamed):
@@ -245,11 +245,17 @@ def new_name(name, year):
     if hay_result[0]:
         dot_index = name.find(".")
         dash_index = name.rfind("-")
-        renamed = date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
+        if dash_index > -1:
+            renamed = date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
+        else:
+            renamed = date + " " + name[:(dot_index - 3)] + " " + year[2:] + name[dot_index:]
     else:
         dot_index = name.find(".")
         dash_index = name.rfind("-")
-        renamed = date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
+        if dash_index > -1:
+            renamed = date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
+        else:
+            renamed = date + " " + name[:dot_index] + " " + year[2:] + name[dot_index:]
     return renamed
 
 def new_name_disb(name, year):
@@ -366,63 +372,59 @@ def move_files(filename, year, match):
     else:
         do_query(info[0], info[1], info[2], info[3])
 
-# Asks user to select a folder
-def folder_select_popup(filename):
-    global select_window
-    select_window = Toplevel(rootWindow)
-    prompt = "The following file could not be sorted. Please select a destination folder."
-    options = [
-                "Alternative Loan Reports",
-                "Budget Reports",
-                "Daily Reports",
-                "Direct Loan Reports",
-                "External Award Reports",
-                "Financial Aid Reports",
-                "Monthly Reports",
-                "Packaging Reports",
-                "Pell Reports",
-                "SAP Reports",
-                "Scholarship Reports",
-                "Unknown Reports",
-                "Weekly Reports"              
-              ]
-    tkinter.Label(select_window, text=prompt, padx=10, pady=5).pack()
-    tkinter.Label(select_window, text=filename, fg='#00f', padx=10).pack()
-    v = tkinter.IntVar()
-    for i, option in enumerate(options):
-        tkinter.Radiobutton(select_window, text=option, variable=v, value=i).pack(anchor="w")
-    tkinter.Button(select_window, text="Submit", command=lambda: handle_selection(options[v.get()], filename)).pack()
-    select_window.mainloop()
+## Asks user to select a folder
+#def folder_select_popup(filename):
+#    global select_window
+#    select_window = Toplevel(rootWindow)
+#    prompt = "The following file could not be sorted. Please select a destination folder."
+#    options = [
+#                "Alternative Loan Reports",
+#                "Budget Reports",
+#                "Daily Reports",
+#                "Direct Loan Reports",
+#                "External Award Reports",
+#                "Financial Aid Reports",
+#                "Monthly Reports",
+#                "Packaging Reports",
+#                "Pell Reports",
+#                "SAP Reports",
+#                "Scholarship Reports",
+#                "Unknown Reports",
+#                "Weekly Reports"              
+#              ]
+#    tkinter.Label(select_window, text=prompt, padx=10, pady=5).pack()
+#    tkinter.Label(select_window, text=filename, fg='#00f', padx=10).pack()
+#    v = tkinter.IntVar()
+#    for i, option in enumerate(options):
+#        tkinter.Radiobutton(select_window, text=option, variable=v, value=i).pack(anchor="w")
+#    tkinter.Button(select_window, text="Submit", command=lambda: handle_selection(options[v.get()], filename)).pack()
+#    select_window.mainloop()
 
-def notify_done():
-    pass
-
-def handle_selection(UOSFA_folder, filename):
-    global select_window
-    select_window.destroy()
-    if test:
-        folder = test_UOSFA_directory / Path(UOSFA_folder)
-        renamed = new_name(filename, current_aid_year)
-        do_query_unknown(filename, renamed, folder)
-    else:
-        folder = UOSFA_directory / Path(UOSFA_folder)
-        renamed = new_name(filename, current_aid_year)
-        do_query_unknown(filename, renamed, folder)
-    done = handle_unknown_files()
-    if(done):
-        notify_done()
-        pass
+#def handle_selection(UOSFA_folder, filename):
+#    global select_window
+#    select_window.destroy()
+#    if test:
+#        folder = test_UOSFA_directory / Path(UOSFA_folder)
+#        renamed = new_name(filename, current_aid_year)
+#        do_query_unknown(filename, renamed, folder)
+#    else:
+#        folder = UOSFA_directory / Path(UOSFA_folder)
+#        renamed = new_name(filename, current_aid_year)
+#        do_query_unknown(filename, renamed, folder)
+#    done = handle_unknown_files()
+#    if(done):
+#        pass
 
 
-# Prompt user to select folder for unknown files
-def handle_unknown_files():
-    global unknown_list
-    done = True
-    for filename in unknown_list:
-        done = False
-        unknown_list.remove(filename)
-        folder_select_popup(filename)
-    return done
+## Prompt user to select folder for unknown files
+#def handle_unknown_files():
+#    global unknown_list
+#    done = True
+#    for filename in unknown_list:
+#        done = False
+#        unknown_list.remove(filename)
+#        folder_select_popup(filename)
+#    return done
         
 
 
@@ -495,12 +497,15 @@ def sort_files():
         root.withdraw()
         directory = filedialog.askdirectory()
         root.destroy()
+        if directory is "":
+            return
         folder_path = directory
         for filename in os.listdir(directory):
             pFilename = Path(filename)
             find_aid_year(pFilename)
         if len(unknown_list) > 0:
-            handle_unknown_files()
+            #handle_unknown_files()
+            pass
     else:
         folder_path = Path(os.getcwd())
         for filename in os.listdir("."):
@@ -542,34 +547,9 @@ def run(year, root):
     else:
         initialize(year, root)
         sort_files()
+
+    return unknown_list
         
 
-# Main method
-#def main():
-#    run("23")
-#    pass
-    #print("Done")
 
-    # add imports after fixinf=x the files then uncomment
-
-    
-
-      # TEMPLATE
-        # Change File_Name to be file as it is received and _new_file_name to what the new file should be.  Prefix date
-        # will be added.
-        # for query in os.listdir("."):
-        # if query.startswith("___________________"):
-        #        do_query(query, date + " _______________" + year + ".xls", directory,
-        #                 lkj_mail.attachments)
-
-        #for mail_group in mail_groups:
-        #if(mail_group.attachments):
-        #    mailer("", aid_year + " Queries", mail_group.recipients,"", mail_group.attachments)
-        #    del mail_group.attachments[:]
-
-
-#if __name__ == "__main__":
-#    main()
-
-#raw_input("So Long, and Thanks for All the Fish.\nPRESS ENTER TO CLOSE.")
 
