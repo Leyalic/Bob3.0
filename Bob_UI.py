@@ -2,8 +2,10 @@
 
 import tkinter as tk
 from tkinter import *
+from tkinter import filedialog
 import tkinter.font as font
 import Do_Queries_Functions
+from pathlib import Path
 
 year_valid = False
 term_valid = False
@@ -19,6 +21,9 @@ Label(rootWindow,image=img).pack()
 
 rootWindow.geometry("850x550")
 
+# Return values of Do_Queries_FUnctions
+direct_loan_flag = False
+alt_loan_flag = False
 unknown_list = []
 
 select_window = None
@@ -31,6 +36,28 @@ aid_year = ""
 
 class BobWindow(tk.Frame):
     
+    def create_dir_orig_window():
+        pass
+
+    def create_alt_orig_window():
+        pass
+
+    def handle_direct_orig():
+        success = Do_Queries_Functions.move_direct_orig()
+        if not success:
+            # Prompt user for orig file
+            # TODO: Call create_dir_orig_window()
+            orig_file = Path(filedialog.askopenfilename()).name
+            Do_Queries_Functions.move_direct_orig_fn(orig_file)
+
+    def handle_alt_orig():
+        success = Do_Queries_Functions.move_alt_orig()
+        if not success:
+            # Prompt user for orig file
+            # TODO: Call create_alt_orig_window
+            orig_file = Path(filedialog.askopenfilename()).name
+            Do_Queries_Functions.move_alt_orig_fn(orig_file)
+
     def handle_selection(option):
         global folder_option
         global select_window
@@ -38,7 +65,7 @@ class BobWindow(tk.Frame):
         folder_option = option
         select_window.destroy()
 
-
+    # Prompt user to select folder for unknown file
     def folder_select_popup(filename):
         global select_window
         select_window = Toplevel(rootWindow)
@@ -99,24 +126,36 @@ class BobWindow(tk.Frame):
 
         return done
 
-    def open_popup(self):
-        global unknown_list
+    # Runs Do_Queries on all files
+    def open_popup(self):       
         global aid_year
+        global direct_loan_flag
+        global alt_loan_flag
+        global unknown_list
+
         if year_valid:
-            #top= Toplevel(rootWindow)
-            #top.geometry("750x250")
-            #top.title("Run Window")
-            #Label(top, text= "Program running, please do not close the window", font=('Helvetica 18 bold')).place(x=100,y= 80)
-            aid_year = self.t1.get()
-            unknown_list = Do_Queries_Functions.run(self.t1.get(), rootWindow)
+            self.exit_Button["state"] = "disabled"
+            self.t1["state"] = "disabled"
+
+            aid_year = self.t1.get()           
+            direct_loan_flag, alt_loan_flag, unknown_list = Do_Queries_Functions.run(self.t1.get(), rootWindow)
 
             if len(unknown_list) > 0:
                 # Disable all window input here
-                self.exit_Button["state"] = "disabled"
+                
                 BobWindow.handle_unknown_files()
                 # Re-enable all window input here
-                self.exit_Button["state"] = "normal"
+                
                 print("Process Completed")
+
+            if direct_loan_flag:
+                BobWindow.handle_direct_orig()
+
+            if alt_loan_flag:
+                BobWindow.handle_alt_orig()
+
+            self.t1["state"] = "normal"
+            self.exit_Button["state"] = "normal"
 
         else:
             rootWindow.bell()
@@ -125,6 +164,7 @@ class BobWindow(tk.Frame):
             prev.focus()
             self.aid_warn_label.config(text = "Aid Year must be provided")
 
+    # Checks if aid year is a 4-digit number
     def validate_aid_year(self, d, i, P, s, S, v, V, W):     
         global year_valid
         global term_valid

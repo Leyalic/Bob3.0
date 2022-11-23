@@ -4,21 +4,6 @@ import os
 import shutil
 from pathlib import Path
 
-# Deprecated
-def move_orig_old(orig_doc, orig_docx, name, aid_year):
-    copy_name = orig_doc
-    copy_docx_name = orig_docx
-    copy_directory = Path("O:/Systems/UOSFA Reports/Alternative Loan Reports")
-    try:
-        shutil.copy(copy_name, copy_directory)
-    except FileNotFoundError as e:
-        try:
-            shutil.copy(copy_docx_name, copy_directory)
-        except FileNotFoundError as f:
-            input("\nCould not locate "+ name + "\nMake sure it is located in O:/Systems/Queries/ALT Loans/" + aid_year + "\n\nPress Enter when ready.")
-    except shutil.Error:
-        pass
-
 def move_orig(filename, source_folder, date, year):
     renamed = date + "ALT Loan ORIG " + year + ".doc"
     dest_folder = Path("O:/UOSFA Reports/Alternative Loan Reports")
@@ -42,16 +27,15 @@ def move_orig(filename, source_folder, date, year):
 
 def al_pre_outbound(test, date, year, query, renamed):
 
-    aid_year = str(int(year) - 1) + "-" + str(year)
-    orig_filename = date + " ALT Loan ORIG " + year + ".doc"
+    #orig_filename = date + " ALT Loan ORIG " + year + ".doc"
 
     if test:
-        directory = os.path.realpath(os.path.join('C:\Testing Bob/ALT Loans/', aid_year))
-        orig_folder = Path('C:/Testing Bob/ALT Loans/')
+        directory = os.path.realpath('C:\Testing Bob/ALT Loans/')
+        #orig_folder = Path('C:/Testing Bob/ALT Loans/')
         #orig_doc = os.path.realpath(os.path.join('C:\Testing Bob/ALT Loans/', orig_filename))
     else:
-        directory = os.path.realpath(os.path.join('O:/Systems/QUERIES/ALT Loans/', aid_year))
-        orig_folder = Path('O:/Systems/QUERIES/ALT Loans/')
+        directory = os.path.realpath('O:/Systems/QUERIES/ALT Loans/')
+        #orig_folder = Path('O:/Systems/QUERIES/ALT Loans/')
         #orig_doc = os.path.realpath(os.path.join('O:/Systems/QUERIES/ALT Loans/', orig_filename))
 
     if not os.path.isdir(directory):
@@ -68,59 +52,59 @@ def al_pre_outbound(test, date, year, query, renamed):
     # - put "None" if it shouldn't be moved to a folder in 'O:/UOSFA Reports/'
 
     if query.startswith("UUFA_ALR_110_CHNG_PDG_TRANS"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_CL_APP_RSPNS_ERR"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LN_FA907_1_REVISE"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LN_FA907_2_REVISE"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LN_SENT_NO_RESP"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LN_EFT_DETAIL_ERR"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LN_EFT_DT_LNDR_ERR"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LOAN_ORIG_ACAD_LVL"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LN_ORIG_EDIT_ERR"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LOAN_ORIG_FA_LOAD"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LOAN_ORIG_SPLT_CDS"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LN_ORIG_VLOAN_RSN"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_ALR_LOAN_SPC_NEED_OVWD"):
-        move_orig(orig_filename, orig_folder, date, year)
+        #move_orig(orig_filename, orig_folder, date, year)
         return (query, renamed, directory, move_directory)
 
     return "Empty" #Leave as final line

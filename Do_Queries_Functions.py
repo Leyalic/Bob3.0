@@ -47,6 +47,8 @@ unknown_list = []
 current_aid_year = ""
 folder_path = Path()
 disbursement_date = datetime.datetime.min
+alt_loan_flag = False
+direct_loan_flag = False
 
 rootWindow = ""
 select_window = ""
@@ -59,6 +61,12 @@ date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})
 #test_UOSFA_directory = Path("O:/UOSFA Reports")
 test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
 UOSFA_directory = Path("O:/UOSFA Reports")
+
+# Origination Filepaths
+test_dir_orig_folder = Path('C:/Testing Bob/Direct Loans/Origination')
+test_alt_orig_folder = Path('C:/Testing Bob/ALT Loans/')
+dir_orig_folder = Path('C:/Testing Bob/Direct Loans/Origination')
+alt_orig_folder = Path('C:/Testing Bob/Direct Loans/Origination')
 
 test = True
 
@@ -289,10 +297,12 @@ def new_name_disb(name, year):
 #        pass
 
 # Move files to corresponding directory
-def move_files(filename, year, match):
+def move_files(filename, year):
     global current_aid_year
     global unknown_list
     global disbursement_date
+    global alt_loan_flag
+    global direct_loan_flag
 
     date = time.strftime("%x").replace("/", "-")
     renamed = new_name(filename, year)
@@ -305,55 +315,59 @@ def move_files(filename, year, match):
     if info == "Empty":
         info = Daily_Queries.do_dailies(test, date, year, filename, renamed)
 # Monday Weekly Queries
-    if info == "Empty": #and filename.startswith("UUFA_WR"):
+    if info == "Empty": 
         info = Monday_DailyQueries.do_monday_weeklies(test, date, year, filename, renamed)
 # Budget Queries
-    if info == "Empty": #and "UUFA_BR" in filename or "UUFA_BR_COA" in filename:
+    if info == "Empty": 
         info = Budget_Queries.do_budget_queries(test, date, year, filename, renamed)
 # Packaging Queries
-    if info == "Empty": #and filename.startswith("UUFA_PRT_ACAD_PROG_REVIEW"):
+    if info == "Empty": 
         info = Packaging_Queries.do_packaging_queries(test, date, year, filename, renamed)
 # Monthly Queries
-    if info == "Empty": #and "MR_PELL_SSN_MISMATCH" in filename:
+    if info == "Empty": 
         info = Monthly_Queries.do_monthlies(test, date, current_aid_year, filename, renamed)
 # Disbursement Queries
-    if info == "Empty": #and filename.startswith("UUFA_DQ_AUTHORIZED_NOT_DISB"):
+    if info == "Empty": 
         info = Disbursement_Queries.do_disb_queries(test, date, year, filename, renamed_disb)
 #2nd LDR Queries
-    if info == "Empty": #and filename.startswith("UUFA_PRT_PELL_ELG_NO_PELL"):
+    if info == "Empty": 
         info = Second_LDR.do_2nd_ldr(test, year, filename, renamed)
 # End of Term Queries
-    if info == "Empty": #and filename.startswith("UUFA_EOT_ACAD_PLAN_RVW"):
+    if info == "Empty": 
         info = EndOfTerm_Queries.do_end_of_term_queries(test, year, filename, renamed)
 # Day After LDR Queries
-    if info == "Empty": #and filename.startswith("UUFA_LDR_MIN_ENROLLMENT_ATH"):
+    if info == "Empty":
         info = Day_AfterLDR.do_day_after_ldr(test, year, filename, renamed)
 # Direct Loans Pre-Outbound Queries
-    if info == "Empty": #and "DLR_LOAN_ORIG_EDIT_ERR" in filename:
+    if info == "Empty": 
         info = Direct_Loan.dl_pre_outbound(test, date, year, filename, renamed)
+        if info != "Empty":
+            direct_loan_flag = True # Notify that ORIG file must be moved
 ## Alternative Loan Pre-Outbound Queries
-    if info == "Empty": #and filename.startswith("UUFA_ALR_LOAN_ORG_LND_NT_CK"):
+    if info == "Empty": 
         info = Alt_Loan_Queries.al_pre_outbound(test, date, year, filename, renamed)
+        if info != "Empty":
+            alt_loan_flag = True # Notify that ORIG file must be moved
 # Pre-Repackaging Queries
-    if info == "Empty": #and filename.startswith("UUFA_PP"):
+    if info == "Empty": 
         info = PrePackaging_Queries.do_pre_repackaging(test, year, filename, renamed)
 # Mid-Repackaging Queries
-    if info == "Empty": #and filename.startswith("UUFA_MP"):
+    if info == "Empty": 
         info = Mid_Repack_Queries.do_mid_repack_queries(test, year, filename, renamed)
 # After Repackaging Queries
-    if info == "Empty": #and filename.startswith("UUFA_AP"):
+    if info == "Empty": 
         info = After_Repack_Queries.do_after_repackaging(test, year, filename, renamed)
 # Daily Scholarships Queries
-    if info == "Empty": #and filename.startswith("UUFA_SCHOLAR_DISB_ZERO"):
+    if info == "Empty": 
         info = Scholarships_Queries.do_daily_scholarships(test, year, filename, renamed)
 # Weekly Scholarships Queries
-    if info == "Empty": #and ("UUFA_WS" in filename):
+    if info == "Empty": 
         info = Scholarships_Queries.do_weekly_scholarships(test, year, filename, renamed)
 # Budget Testing Queries
-    if info == "Empty": #and filename.startswith("UUFA_BUDGET_20"):
+    if info == "Empty": 
         info = Budget_Queries.do_budget_test_queries(test, date, year, filename, renamed)
 # ATB and 3C Queries
-    if info == "Empty": #and "UUFA_ATB" in filename:
+    if info == "Empty": 
         info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(test, filename, renamed)
 # Remove extra files 
     if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
@@ -361,7 +375,7 @@ def move_files(filename, year, match):
         print("Removed " + filename)
         info = "Removed"
 # Transfer Student Monitoring
-    if info == "Empty": #and "_NSLDS" in filename:
+    if info == "Empty": 
         info = Tsm_Queries.do_tsm_queries(test, filename, renamed)
 
 # Unknown File
@@ -372,61 +386,80 @@ def move_files(filename, year, match):
     else:
         do_query(info[0], info[1], info[2], info[3])
 
-## Asks user to select a folder
-#def folder_select_popup(filename):
-#    global select_window
-#    select_window = Toplevel(rootWindow)
-#    prompt = "The following file could not be sorted. Please select a destination folder."
-#    options = [
-#                "Alternative Loan Reports",
-#                "Budget Reports",
-#                "Daily Reports",
-#                "Direct Loan Reports",
-#                "External Award Reports",
-#                "Financial Aid Reports",
-#                "Monthly Reports",
-#                "Packaging Reports",
-#                "Pell Reports",
-#                "SAP Reports",
-#                "Scholarship Reports",
-#                "Unknown Reports",
-#                "Weekly Reports"              
-#              ]
-#    tkinter.Label(select_window, text=prompt, padx=10, pady=5).pack()
-#    tkinter.Label(select_window, text=filename, fg='#00f', padx=10).pack()
-#    v = tkinter.IntVar()
-#    for i, option in enumerate(options):
-#        tkinter.Radiobutton(select_window, text=option, variable=v, value=i).pack(anchor="w")
-#    tkinter.Button(select_window, text="Submit", command=lambda: handle_selection(options[v.get()], filename)).pack()
-#    select_window.mainloop()
+#################################################################
+# Moving loan origination files
+def move_direct_orig():
+    return move_direct_orig_fn(date + " DL ORIG " + current_aid_year + ".doc")
 
-#def handle_selection(UOSFA_folder, filename):
-#    global select_window
-#    select_window.destroy()
-#    if test:
-#        folder = test_UOSFA_directory / Path(UOSFA_folder)
-#        renamed = new_name(filename, current_aid_year)
-#        do_query_unknown(filename, renamed, folder)
-#    else:
-#        folder = UOSFA_directory / Path(UOSFA_folder)
-#        renamed = new_name(filename, current_aid_year)
-#        do_query_unknown(filename, renamed, folder)
-#    done = handle_unknown_files()
-#    if(done):
-#        pass
+def move_direct_orig_fn(filename):
+    if test:
+        source_folder = test_dir_orig_folder
+    else:
+        source_folder = dir_orig_folder
 
+    renamed = date + " DL ORIG " + current_aid_year + ".doc"
+    dest_folder = Path("O:/UOSFA Reports/Direct Loan Reports")
 
-## Prompt user to select folder for unknown files
-#def handle_unknown_files():
-#    global unknown_list
-#    done = True
-#    for filename in unknown_list:
-#        done = False
-#        unknown_list.remove(filename)
-#        folder_select_popup(filename)
-#    return done
-        
+    source_file = source_folder / Path(filename)
+    source_filex = Path(str(source_file) + "x")
+    dest_file = dest_folder / Path(renamed)
+    dest_filex = Path(str(dest_file) + "x")
 
+    source_file2 = source_folder / Path(str(filename) + " (2)")
+    source_file2x = Path(str(source_file2) + "x")
+    dest_file2 = dest_folder / Path(str(renamed) + " (2)")
+    dest_file2x = Path(str(dest_file2) + "x")
+    
+    # Copy orig file
+    if not isfile(dest_file) and not isfile(dest_filex):
+        try:
+            shutil.copy(source_file, dest_file)
+        except FileNotFoundError as e:
+            try:
+                shutil.copy(source_filex, dest_filex)
+            except FileNotFoundError as e:
+                return False
+    
+    # Copy orig file (2)
+    if not isfile(dest_file2) and not isfile(dest_file2x):
+        try:
+            shutil.copy(source_file2, dest_file2)
+        except FileNotFoundError as e:
+            try:
+                shutil.copy(source_file2x, dest_file2x)
+            except FileNotFoundError as e:
+                pass
+    return True
+ 
+def move_alt_orig():
+    return move_alt_orig_fn(date + " ALT Loan ORIG " + current_aid_year + ".doc")
+
+def move_alt_orig_fn(filename):
+    if test:
+        source_folder = test_alt_orig_folder
+    else:
+        source_folder = alt_orig_folder
+
+    renamed = date + "ALT Loan ORIG " + current_aid_year + ".doc"
+    dest_folder = Path("O:/UOSFA Reports/Alternative Loan Reports")
+
+    source_file = source_folder / Path(filename)
+    source_filex = Path(str(source_file) + "x")
+    dest_file = dest_folder / Path(renamed)
+    dest_filex = Path(str(dest_file) + "x")
+    
+    if not isfile(dest_file) and not isfile(dest_filex):
+        try:
+            shutil.copy(source_file, dest_file)
+        except FileNotFoundError as e:
+            try:
+                shutil.copy(source_filex, dest_filex)
+            except FileNotFoundError as e:
+                return False
+    return True
+
+# Moving loan Originiation files <end>
+#####################################################################
 
 def aid_year_match(year):
     global current_aid_year
@@ -447,44 +480,35 @@ def find_aid_year(filename):
     if file_year[0]:
         if is_odd_year(file_year[1]):
             odd_aid_years.append(str(filestring))
-            move_files(filestring, file_year[1], aid_year_match(file_year[1]))
+            move_files(filestring, file_year[1])
         else:
             even_aid_years.append(str(filestring))
-            move_files(filestring, file_year[1], aid_year_match(file_year[1]))
+            move_files(filestring, file_year[1])
 
     elif filestring.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
         file_year = search_excel_file(filename) # file_year: (bool has_year, str year)
         if file_year[0]:
             if is_odd_year(file_year[1]):
                 odd_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1], aid_year_match(file_year[1]))
+                move_files(filestring, file_year[1])
             else:
                 even_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1], aid_year_match(file_year[1]))
+                move_files(filestring, file_year[1])
         else: # Default for spreadsheets is current year
             if is_odd_year(current_aid_year):
                 odd_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year, True)
+                move_files(filestring, current_aid_year)
             else:
                 even_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year, True)
+                move_files(filestring, current_aid_year)
     else:
-        if test:
-            # Default is current year
-            if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year, True)
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year, True)
-            #print("Couldn't find year of " + filestring)
+        # Default is current year
+        if is_odd_year(current_aid_year):
+            odd_aid_years.append(str(filestring))
+            move_files(filestring, current_aid_year)
         else:
-            if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year, True)
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year, True)
+            even_aid_years.append(str(filestring))
+            move_files(filestring, current_aid_year)
     
 # Sort all files in directory into odd or even aid years
 def sort_files():
@@ -548,7 +572,7 @@ def run(year, root):
         initialize(year, root)
         sort_files()
 
-    return unknown_list
+    return (direct_loan_flag, alt_loan_flag, unknown_list)
         
 
 
