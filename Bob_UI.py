@@ -1,11 +1,13 @@
 #Created by Iman Essaghir
 
+from fileinput import filename
 import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
 import tkinter.font as font
 import Do_Queries_Functions
 from pathlib import Path
+import time
 
 year_valid = False
 term_valid = False
@@ -27,37 +29,88 @@ alt_loan_flag = False
 unknown_list = []
 
 select_window = None
-
 folder_option = ""
 
+orig_window = None
+orig_path = None
+myWin = None
+
 aid_year = ""
+date = time.strftime("%x").replace("/", "-")
+
+running_text = "Program running, please do not close the window"
 
 #Adding widgets
 
 class BobWindow(tk.Frame):
     
-    def create_dir_orig_window():
-        pass
+    # Handler for orig window popup
+    def handle_orig_window():
+        global orig_window
+        global orig_path
+        orig_path = Path(filedialog.askopenfilename()).name
+        orig_window.destroy()
 
-    def create_alt_orig_window():
-        pass
+    # Prompt user to select origination file
+    def create_orig_window(filename, pathname):
+        global orig_window
+        orig_window = Toplevel(rootWindow)
+        orig_window.grab_set(); # Disable interacting with root
 
-    def handle_direct_orig():
+        prompt1 = "Could not locate the following file:"
+        prompt2 = filename
+        prompt3 = "in the following location:"
+        prompt4 = pathname
+        prompt5 = "Please select origination file"
+        tk.Label(orig_window, text=prompt1, padx=10, pady=5).pack()
+        tk.Label(orig_window, text=prompt2, fg='#00f', padx=10, pady=5).pack()
+        tk.Label(orig_window, text=prompt3, padx=10, pady=5).pack()
+        tk.Label(orig_window, text=prompt4, fg='#00f', padx=10, pady=5).pack()
+        tk.Label(orig_window, text=prompt5, padx=10, pady=5).pack()
+
+        select_button = Button(orig_window, text="Select File", bd="2", command=lambda: BobWindow.handle_orig_window(), height="2", width="15")
+        skip_button = Button(orig_window, text="Skip", bd="2", command=lambda: orig_window.destroy(), height="2", width="15")
+
+        select_button.pack(side="left", anchor="e",padx=18, pady=18)
+        skip_button.pack(side="right", anchor="w",padx=18, pady=18)
+
+        return orig_window   
+
+    # Copy direct loan origination file into UOSFA folder
+    def run_direct_orig():
         success = Do_Queries_Functions.move_direct_orig()
         if not success:
             # Prompt user for orig file
-            # TODO: Call create_dir_orig_window()
-            orig_file = Path(filedialog.askopenfilename()).name
-            Do_Queries_Functions.move_direct_orig_fn(orig_file)
+            filename = date + " DL ORIG " + aid_year + ".doc"
+            pathname = "O:/Systems/Direct Loans/Origination/\n\n"
+            
+            # Stores user submitted filepath in global 'orig_path'
+            wind = BobWindow.create_orig_window(filename, pathname)
+            rootWindow.wait_window(wind)
 
-    def handle_alt_orig():
+            if orig_path is None:
+                pass
+            else:
+                Do_Queries_Functions.move_direct_orig_fn(orig_path)
+    
+    # Copy alt loan origination file into UOSFA folder
+    def run_alt_orig():
         success = Do_Queries_Functions.move_alt_orig()
         if not success:
             # Prompt user for orig file
-            # TODO: Call create_alt_orig_window
-            orig_file = Path(filedialog.askopenfilename()).name
-            Do_Queries_Functions.move_alt_orig_fn(orig_file)
+            filename = date + " ALT Loan ORIG " + aid_year + ".doc"
+            pathname = "O:/Systems/QUERIES/ALT Loans/\n\n"
+            
+            # Stores user submitted filepath in global 'orig_path'
+            wind = BobWindow.create_orig_window(filename, pathname)
+            rootWindow.wait_window(wind)
 
+            if orig_path is None:
+                pass
+            else:
+                Do_Queries_Functions.move_alt_orig_fn(orig_path)
+
+    # Handler for folder select popup
     def handle_selection(option):
         global folder_option
         global select_window
@@ -69,6 +122,12 @@ class BobWindow(tk.Frame):
     def folder_select_popup(filename):
         global select_window
         select_window = Toplevel(rootWindow)
+        
+        select_window.grab_set(); # Disable interacting with root
+
+        x_loc = rootWindow.winfo_x()
+        y_loc = rootWindow.winfo_y()
+        select_window.geometry('+%d+%d' % (x_loc + 10, y_loc +10))
         prompt = "The following file could not be sorted. Please select a destination folder."
         options = [
                     "Alternative Loan Reports",
@@ -91,7 +150,7 @@ class BobWindow(tk.Frame):
         for i, option in enumerate(options):
             tk.Radiobutton(select_window, text=option, variable=v, value=i).pack(anchor="w")
         tk.Button(select_window, text="Submit", command=lambda: BobWindow.handle_selection(options[v.get()])).pack()
-        #select_window.mainloop()
+        v.set(11)
         select_window.title("Select Folder")
         return select_window
 
@@ -134,8 +193,11 @@ class BobWindow(tk.Frame):
         global unknown_list
 
         if year_valid:
+
             self.exit_Button["state"] = "disabled"
             self.t1["state"] = "disabled"
+            self.b1["state"] = "disabled"
+            self.run_label["text"] = running_text
 
             aid_year = self.t1.get()           
             direct_loan_flag, alt_loan_flag, unknown_list = Do_Queries_Functions.run(self.t1.get(), rootWindow)
@@ -149,20 +211,23 @@ class BobWindow(tk.Frame):
                 print("Process Completed")
 
             if direct_loan_flag:
-                BobWindow.handle_direct_orig()
+                BobWindow.run_direct_orig()
 
             if alt_loan_flag:
-                BobWindow.handle_alt_orig()
+                BobWindow.run_alt_orig()
 
+            self.run_label["text"] = ""
+            self.b1["state"] = "normal"
             self.t1["state"] = "normal"
             self.exit_Button["state"] = "normal"
-
+            
         else:
             rootWindow.bell()
             prev = self.focus_get()
             self.b1.focus()
             prev.focus()
             self.aid_warn_label.config(text = "Aid Year must be provided")
+
 
     # Checks if aid year is a 4-digit number
     def validate_aid_year(self, d, i, P, s, S, v, V, W):     
@@ -197,8 +262,7 @@ class BobWindow(tk.Frame):
 
     def __init__(self, win):
         tk.Frame.__init__(self, win)
-        self.lbl1=Label(win, text='Please enter the aid year', fg='red', font=("Times New Roman bold", 13))
-        self.lbl2=Label(win, text='Please select S term', fg='red', font=("Times New Roman bold", 13))
+        self.lbl1=Label(win, text='Please enter the aid year', fg='black', font=("Times New Roman bold", 13))
        
         aid_valid = (self.register(self.validate_aid_year),
                 '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
@@ -212,11 +276,12 @@ class BobWindow(tk.Frame):
         self.lbl1.place(x=200, y=300)
         self.t1.place(x=600, y=300)
         
-                
+        self.run_label = Label(win, text="", fg='red', font=("Times New Roman bold", 13)) 
+        self.run_label.place(x=260, y=375)
 
         #Create a button in the main Window to open the popup
  
-        self.b1=Button(win, text="Run", bd="4", command=self.open_popup, height="5", width="30")
+        self.b1=Button(win, text="Run", font=('Helvatical bold',12), bd="4", command=self.open_popup, height=2, width=10)
         self.b1.pack(side=BOTTOM, anchor="center",padx=18, pady=18)
     
         self.exit_Button = Button(rootWindow, text="Exit Program", command=rootWindow.destroy)
@@ -226,6 +291,6 @@ class BobWindow(tk.Frame):
    
         #win.mainloop()
 
-mywin=BobWindow(rootWindow)
+myWin=BobWindow(rootWindow)
 
 rootWindow.mainloop()
