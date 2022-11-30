@@ -48,7 +48,7 @@ class BobWindow(tk.Frame):
     def handle_orig_window():
         global orig_window
         global orig_path
-        orig_path = Path(filedialog.askopenfilename()).name
+        orig_path = Path(filedialog.askopenfilename())
         orig_window.destroy()
 
     # Prompt user to select origination file
@@ -78,7 +78,7 @@ class BobWindow(tk.Frame):
 
     # Copy direct loan origination file into UOSFA folder
     def run_direct_orig():
-        success = Do_Queries_Functions.move_direct_orig()
+        success = Do_Queries_Functions.move_direct_orig("", True)
         if not success:
             # Prompt user for orig file
             filename = date + " DL ORIG " + aid_year + ".doc"
@@ -91,11 +91,11 @@ class BobWindow(tk.Frame):
             if orig_path is None:
                 pass
             else:
-                Do_Queries_Functions.move_direct_orig_fn(orig_path)
+                Do_Queries_Functions.move_direct_orig(orig_path, False)
     
     # Copy alt loan origination file into UOSFA folder
     def run_alt_orig():
-        success = Do_Queries_Functions.move_alt_orig()
+        success = Do_Queries_Functions.move_alt_orig("", True)
         if not success:
             # Prompt user for orig file
             filename = date + " ALT Loan ORIG " + aid_year + ".doc"
@@ -108,7 +108,7 @@ class BobWindow(tk.Frame):
             if orig_path is None:
                 pass
             else:
-                Do_Queries_Functions.move_alt_orig_fn(orig_path)
+                Do_Queries_Functions.move_alt_orig(orig_path, False)
 
     # Handler for folder select popup
     def handle_selection(option):

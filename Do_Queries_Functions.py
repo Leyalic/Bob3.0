@@ -1,5 +1,4 @@
 # Created by Joshua Hardy and mmason
-from asyncio.windows_events import NULL
 from genericpath import isfile
 import os
 import re
@@ -9,7 +8,6 @@ import time
 import shutil
 import tkinter
 from tkinter import filedialog
-from tkinter import Toplevel
 from pathlib import Path
 
 {}
@@ -113,6 +111,8 @@ def search_excel_file(filename):
     workbook.close()
     return (has, year)
 
+# Prints list of sorted files to terminal
+# **(For use when debugging)**
 def output_sorted_files():
     print("Odds: ")
     for filename in odd_aid_years:
@@ -122,83 +122,6 @@ def output_sorted_files():
     for filename in even_aid_years:
         print("- " + filename)
     print("")
-
-
-# The old rename method from DoQueries without attach lists *modified*
-def rename_file(name, new_name, i=2):
-    this_name = os.path.realpath(name)
-    this_new_name = os.path.realpath(new_name)
-    dot_index = this_new_name.find(".")
-    num = i
-    renamed = this_new_name
-    try:
-        os.rename(this_name, this_new_name)
-    except WindowsError as e:
-        try:
-            final_name = this_new_name[:dot_index] + " (" + str(num) + ")" + this_new_name[dot_index:]
-            os.rename(this_name, final_name)
-            renamed = final_name
-        except WindowsError:
-            rename_file(this_name, this_new_name, num + 1)
-    finally:
-        return renamed
-            
-
-## The old move method from DoQueries *modified*
-#def move_to_folder(name, to_directory, num=2):
-#    move_name = name
-#    move_directory = to_directory
-#    try:
-#        shutil.move(move_name, move_directory)
-#    except FileNotFoundError as e:
-#        print(e)
-#    except shutil.Error:
-#        print ("Already a file with the name:" + name + "at location.")
-#        dot_index = move_name.find(".")
-#        final_name = move_name[:dot_index] + " (" + str(num) + ")" + move_name[dot_index:]
-#        renamed = rename_file(name, final_name, num+1)
-#        move_to_folder(renamed, to_directory, num+1)
-#    except IOError as e:
-#        print(e)
-#        pass
-
-## Copies file to folder without removing it
-#def copy_to_folder(name, to_directory, num=2):
-#    copy_name = name
-#    copy_directory = to_directory
-#    try:
-#        shutil.copy(copy_name, copy_directory)
-#    except FileNotFoundError as e:
-#        print(e)
-#    except shutil.Error:
-#        print ("Already a file with the name:" + name + "at location.")
-#        renamed = rename_file(name, name, num+1)
-#        copy_to_folder(renamed, to_directory, num+1)
-#    except IOError as e:
-#        print(e)
-#        pass
-
-## The old do query method from DoQueries without attach lists *modified*
-#def do_query_old(name, new_name, legacy_archive, UOSFA_folder, i=2):
-#    global folder_path
-#    global UOSFA_directory
-
-#    this_name = str(folder_path / Path(name))
-#    this_new_name = str(folder_path / Path(new_name))
-#    if test:
-#        this_destination = str(test_UOSFA_directory / UOSFA_folder)
-#    else:       
-#        this_destination = str(UOSFA_directory / UOSFA_folder)
-
-#    num = i
-#    if num == 2:
-#        renamed = rename_file(this_name, this_new_name, num)
-#        this_name = str(folder_path / Path(this_new_name))
-#        if UOSFA_folder == "None":
-#            move_to_folder(this_name, legacy_archive, i)
-#        else:
-#            copy_to_folder(this_name, legacy_archive, i)        
-#            move_to_folder(this_name, this_destination, i)
 
 # Renames file to ensure no duplicates at desired location
 def rename_no_duplicates(folder_path, renamed):
@@ -215,7 +138,7 @@ def rename_no_duplicates(folder_path, renamed):
             filepath = filepath[:dot_index] + " (2)" + filepath[dot_index:]
     return filepath
 
-# A new do query method made from scratch for better handling of duplicate files
+# Renames, copies, and moves file to desired destination
 def do_query(name, renamed, legacy_archive, UOSFA_folder):
 
     current_filepath = str(folder_path / Path(name))
@@ -234,7 +157,7 @@ def do_query(name, renamed, legacy_archive, UOSFA_folder):
         shutil.copy(current_filepath, legacy_filepath)
         shutil.move(current_filepath, UOSFA_filepath)    
 
-# The do query method for manually selected folders
+# Renames and moves file to manually selected folder
 def do_query_unknown(name, renamed, destination):
     
     current_filepath = str(folder_path / Path(name))
@@ -246,7 +169,8 @@ def do_query_unknown(name, renamed, destination):
 
     destination_filepath = rename_no_duplicates(UOSFA_destination, renamed)
     shutil.move(current_filepath, destination_filepath)
-        
+
+# Returns renamed filename with current date and aid year included        
 def new_name(name, year):
     hay_result = has_aid_year(name)
     renamed = ""
@@ -266,6 +190,7 @@ def new_name(name, year):
             renamed = date + " " + name[:dot_index] + " " + year[2:] + name[dot_index:]
     return renamed
 
+# Returns renamed filename with disbursement date and aid year included   
 def new_name_disb(name, year):
     hay_result = has_aid_year(name)
     renamed = ""
@@ -278,23 +203,6 @@ def new_name_disb(name, year):
         dash_index = name.rfind("-")
         renamed = disbursement_date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
     return renamed
-
-## Copy the entire file structure to a new folder
-#def copy_to_archive():
-#    if test:
-#        source = test_destination_folder
-#        folder_name = "Test" + str(current_aid_year)
-#        destination = test_copy_folder / folder_name
-#    else:
-#        source = destination_folder
-#        destination = copy_folder / "new folder name"
-#    try:
-#        shutil.copytree(source, destination)
-#    except shutil.Error:
-#        print ("Already a folder at location.")
-#    except IOError as e:
-#        print(e)
-#        pass
 
 # Move files to corresponding directory
 def move_files(filename, year):
@@ -340,12 +248,12 @@ def move_files(filename, year):
         info = Day_AfterLDR.do_day_after_ldr(test, year, filename, renamed)
 # Direct Loans Pre-Outbound Queries
     if info == "Empty": 
-        info = Direct_Loan.dl_pre_outbound(test, date, year, filename, renamed)
+        info = Direct_Loan.dl_pre_outbound(test, filename, renamed)
         if info != "Empty":
             direct_loan_flag = True # Notify that ORIG file must be moved
 ## Alternative Loan Pre-Outbound Queries
     if info == "Empty": 
-        info = Alt_Loan_Queries.al_pre_outbound(test, date, year, filename, renamed)
+        info = Alt_Loan_Queries.al_pre_outbound(test, filename, renamed)
         if info != "Empty":
             alt_loan_flag = True # Notify that ORIG file must be moved
 # Pre-Repackaging Queries
@@ -387,26 +295,31 @@ def move_files(filename, year):
         do_query(info[0], info[1], info[2], info[3])
 
 #################################################################
-# Moving loan origination files
-def move_direct_orig():
-    return move_direct_orig_fn(date + " DL ORIG " + current_aid_year + ".doc")
+# Loan origination functions
 
-def move_direct_orig_fn(filename):
+def move_direct_orig(filepath, dflt):
     if test:
         source_folder = test_dir_orig_folder
+        dest_folder = test_UOSFA_directory / Path("Direct Loan Reports")
     else:
         source_folder = dir_orig_folder
+        dest_folder = Path("O:/UOSFA Reports/Direct Loan Reports")
 
-    renamed = date + " DL ORIG " + current_aid_year + ".doc"
-    dest_folder = Path("O:/UOSFA Reports/Direct Loan Reports")
+    renamed = date + " DL ORIG " + current_aid_year + ".doc"   
 
-    source_file = source_folder / Path(filename)
-    source_filex = Path(str(source_file) + "x")
+    if (dflt):
+        source_file = source_folder / Path(date + " DL ORIG " + current_aid_year + ".doc")
+        source_filex = Path(str(source_file) + "x")
+        source_file2 = source_folder / Path(str(date + " DL ORIG " + current_aid_year + ".doc") + " (2)")
+        source_file2x = Path(str(source_file2) + "x")
+    else:
+        source_file = Path(filepath)
+        source_filex = Path(str(source_file) + "x")
+        source_file2 = Path(str(filepath) + " (2)")
+        source_file2x = Path(str(source_file2) + "x")
+    
     dest_file = dest_folder / Path(renamed)
-    dest_filex = Path(str(dest_file) + "x")
-
-    source_file2 = source_folder / Path(str(filename) + " (2)")
-    source_file2x = Path(str(source_file2) + "x")
+    dest_filex = Path(str(dest_file) + "x") 
     dest_file2 = dest_folder / Path(str(renamed) + " (2)")
     dest_file2x = Path(str(dest_file2) + "x")
     
@@ -430,21 +343,24 @@ def move_direct_orig_fn(filename):
             except FileNotFoundError as e:
                 pass
     return True
- 
-def move_alt_orig():
-    return move_alt_orig_fn(date + " ALT Loan ORIG " + current_aid_year + ".doc")
 
-def move_alt_orig_fn(filename):
+def move_alt_orig(filepath, dflt):
     if test:
         source_folder = test_alt_orig_folder
+        dest_folder = test_UOSFA_directory / Path("Alternative Loan Reports")
     else:
         source_folder = alt_orig_folder
+        dest_folder = Path("O:/UOSFA Reports/Alternative Loan Reports")
 
-    renamed = date + "ALT Loan ORIG " + current_aid_year + ".doc"
-    dest_folder = Path("O:/UOSFA Reports/Alternative Loan Reports")
+    renamed = date + "ALT Loan ORIG " + current_aid_year + ".doc" 
 
-    source_file = source_folder / Path(filename)
-    source_filex = Path(str(source_file) + "x")
+    if (dflt):
+        source_file = source_folder / Path(date + " ALT Loan ORIG " + current_aid_year + ".doc")
+        source_filex = Path(str(source_file) + "x")
+    else:
+        source_file = Path(filepath)
+        source_filex = Path(str(source_file) + "x")
+
     dest_file = dest_folder / Path(renamed)
     dest_filex = Path(str(dest_file) + "x")
     
@@ -458,7 +374,7 @@ def move_alt_orig_fn(filename):
                 return False
     return True
 
-# Moving loan Originiation files <end>
+# Loan origination functions <end>
 #####################################################################
 
 def aid_year_match(year):
@@ -527,19 +443,11 @@ def sort_files():
         for filename in os.listdir(directory):
             pFilename = Path(filename)
             find_aid_year(pFilename)
-        if len(unknown_list) > 0:
-            #handle_unknown_files()
-            pass
     else:
         folder_path = Path(os.getcwd())
         for filename in os.listdir("."):
             pFilename = Path(filename)
             find_aid_year(pFilename)
-
-        if len(unknown_list) > 0:
-            #handle_unknown_files()
-            pass
-
 
 # User Input - Initialize Aid year and disbursement date
 def initialize(year, root):
