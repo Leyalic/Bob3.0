@@ -1,4 +1,4 @@
-#Created by Iman Essaghir
+#Created by Iman Essaghir and Joshua Hardy
 
 from fileinput import filename
 import tkinter as tk

@@ -294,9 +294,7 @@ def move_files(filename, year):
     else:
         do_query(info[0], info[1], info[2], info[3])
 
-#################################################################
-# Loan origination functions
-
+# Copy origination file for direct loans
 def move_direct_orig(filepath, dflt):
     if test:
         source_folder = test_dir_orig_folder
@@ -344,6 +342,7 @@ def move_direct_orig(filepath, dflt):
                 pass
     return True
 
+# Copy origination file for alt loans
 def move_alt_orig(filepath, dflt):
     if test:
         source_folder = test_alt_orig_folder
@@ -373,9 +372,6 @@ def move_alt_orig(filepath, dflt):
             except FileNotFoundError as e:
                 return False
     return True
-
-# Loan origination functions <end>
-#####################################################################
 
 def aid_year_match(year):
     global current_aid_year
