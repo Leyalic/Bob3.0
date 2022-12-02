@@ -12,23 +12,25 @@ from pathlib import Path
 
 {}
 # Query imports
-import After_Repack_Queries
-import Alt_Loan_Queries
-import Atb_Fbill_3C_Queries
-import Budget_Queries
-import Daily_Queries
-import Day_AfterLDR
-import Direct_Loan
-import Disbursement_Queries
-import EndOfTerm_Queries
-import Mid_Repack_Queries
-import Monday_DailyQueries
-import Monthly_Queries
-import Packaging_Queries
-import PrePackaging_Queries
-import Scholarships_Queries
-import Second_LDR
-import Tsm_Queries
+import sys
+sys.path.insert(1, '../Files/')
+from Files import After_Repack_Queries
+from Files import Alt_Loan_Queries
+from Files import Atb_Fbill_3C_Queries
+from Files import Budget_Queries
+from Files import Daily_Queries
+from Files import Day_AfterLDR
+from Files import Direct_Loan
+from Files import Disbursement_Queries
+from Files import EndOfTerm_Queries
+from Files import Mid_Repack_Queries
+from Files import Monday_DailyQueries
+from Files import Monthly_Queries
+from Files import Packaging_Queries
+from Files import PrePackaging_Queries
+from Files import Scholarships_Queries
+from Files import Second_LDR
+from Files import Tsm_Queries
 
 
 # The date becomes the current date and is then placed in MM-DD-YY format
@@ -428,22 +430,23 @@ def sort_files():
     global test
     global unknown_list
 
-    if test:
-        root = tkinter.Tk()    
-        root.withdraw()
-        directory = filedialog.askdirectory()
-        root.destroy()
-        if directory is "":
-            return
-        folder_path = directory
-        for filename in os.listdir(directory):
-            pFilename = Path(filename)
-            find_aid_year(pFilename)
-    else:
-        folder_path = Path(os.getcwd())
-        for filename in os.listdir("."):
-            pFilename = Path(filename)
-            find_aid_year(pFilename)
+
+    root = tkinter.Tk()    
+    root.withdraw()
+    directory = filedialog.askdirectory()
+    root.destroy()
+    if directory == "":
+        return
+    folder_path = directory
+    for filename in os.listdir(directory):
+        pFilename = Path(filename)
+        find_aid_year(pFilename)
+
+    # Old Version of File Select
+    #folder_path = Path(os.getcwd())
+    #for filename in os.listdir("."):
+    #    pFilename = Path(filename)
+    #    find_aid_year(pFilename)
 
 # User Input - Initialize Aid year and disbursement date
 def initialize(year, root):

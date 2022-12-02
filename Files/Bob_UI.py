@@ -1,11 +1,13 @@
 #Created by Iman Essaghir and Joshua Hardy
+import sys
+sys.path.insert(1, '../Files/')
+from Files import Do_Queries_Functions
 
 from fileinput import filename
 import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
 import tkinter.font as font
-import Do_Queries_Functions
 from pathlib import Path
 import time
 
@@ -289,8 +291,11 @@ class BobWindow(tk.Frame):
 
         self.winfo_toplevel().title("Bob Window")
    
-        #win.mainloop()
+def main():
+    global myWin
+    global rootWindow
+    myWin=BobWindow(rootWindow)
+    rootWindow.mainloop()
 
-myWin=BobWindow(rootWindow)
-
-rootWindow.mainloop()
+if __name__ == "__main__":
+    main()
