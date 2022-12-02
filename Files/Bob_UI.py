@@ -176,14 +176,14 @@ class BobWindow(tk.Frame):
                 unknown_list.remove(filename)
                 continue
 
-            print("Moved to " + folder_option)
+            #("Moved to " + folder_option)
 
             # Move file to selected folder
             renamed = Do_Queries_Functions.new_name(filename, aid_year)           
             Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option)
             unknown_list.remove(filename)
 
-        print("All Unknown Files Handled")
+        #print("All Unknown Files Handled")
 
         return done
 
@@ -210,7 +210,7 @@ class BobWindow(tk.Frame):
                 BobWindow.handle_unknown_files()
                 # Re-enable all window input here
                 
-                print("Process Completed")
+                #print("Process Completed")
 
             if direct_loan_flag:
                 BobWindow.run_direct_orig()

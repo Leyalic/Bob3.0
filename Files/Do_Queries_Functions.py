@@ -33,6 +33,9 @@ from Files import Second_LDR
 from Files import Tsm_Queries
 
 
+test = True
+
+
 # The date becomes the current date and is then placed in MM-DD-YY format
 date = time.strftime("%x").replace("/", "-")
 now = datetime.datetime.now()
@@ -68,12 +71,12 @@ test_alt_orig_folder = Path('C:/Testing Bob/ALT Loans/')
 dir_orig_folder = Path('C:/Testing Bob/Direct Loans/Origination')
 alt_orig_folder = Path('C:/Testing Bob/Direct Loans/Origination')
 
-test = True
 
 # Odd year
 def is_odd_year(year):
     year_int = int(year[-1])
     return year_int % 2 == 1
+
 
 # Search for and return aid year in filename
 def has_aid_year(filename):
@@ -85,6 +88,7 @@ def has_aid_year(filename):
         has = True
         year = "20" + found_year.group()[1:-1]
     return (has, year)
+
 
 # Search for and return aid year in excel file
 def search_excel_file(filename):
@@ -113,6 +117,7 @@ def search_excel_file(filename):
     workbook.close()
     return (has, year)
 
+
 # Prints list of sorted files to terminal
 # **(For use when debugging)**
 def output_sorted_files():
@@ -124,6 +129,7 @@ def output_sorted_files():
     for filename in even_aid_years:
         print("- " + filename)
     print("")
+
 
 # Renames file to ensure no duplicates at desired location
 def rename_no_duplicates(folder_path, renamed):
@@ -139,6 +145,7 @@ def rename_no_duplicates(folder_path, renamed):
             dot_index = filepath.find(".")
             filepath = filepath[:dot_index] + " (2)" + filepath[dot_index:]
     return filepath
+
 
 # Renames, copies, and moves file to desired destination
 def do_query(name, renamed, legacy_archive, UOSFA_folder):
@@ -157,7 +164,8 @@ def do_query(name, renamed, legacy_archive, UOSFA_folder):
         legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
         UOSFA_filepath = rename_no_duplicates(UOSFA_destination, renamed)
         shutil.copy(current_filepath, legacy_filepath)
-        shutil.move(current_filepath, UOSFA_filepath)    
+        shutil.move(current_filepath, UOSFA_filepath)   
+        
 
 # Renames and moves file to manually selected folder
 def do_query_unknown(name, renamed, destination):
@@ -171,6 +179,7 @@ def do_query_unknown(name, renamed, destination):
 
     destination_filepath = rename_no_duplicates(UOSFA_destination, renamed)
     shutil.move(current_filepath, destination_filepath)
+
 
 # Returns renamed filename with current date and aid year included        
 def new_name(name, year):
@@ -192,6 +201,7 @@ def new_name(name, year):
             renamed = date + " " + name[:dot_index] + " " + year[2:] + name[dot_index:]
     return renamed
 
+
 # Returns renamed filename with disbursement date and aid year included   
 def new_name_disb(name, year):
     hay_result = has_aid_year(name)
@@ -205,6 +215,7 @@ def new_name_disb(name, year):
         dash_index = name.rfind("-")
         renamed = disbursement_date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
     return renamed
+
 
 # Move files to corresponding directory
 def move_files(filename, year):
@@ -296,6 +307,7 @@ def move_files(filename, year):
     else:
         do_query(info[0], info[1], info[2], info[3])
 
+
 # Copy origination file for direct loans
 def move_direct_orig(filepath, dflt):
     if test:
@@ -344,6 +356,7 @@ def move_direct_orig(filepath, dflt):
                 pass
     return True
 
+
 # Copy origination file for alt loans
 def move_alt_orig(filepath, dflt):
     if test:
@@ -373,7 +386,8 @@ def move_alt_orig(filepath, dflt):
                 shutil.copy(source_filex, dest_filex)
             except FileNotFoundError as e:
                 return False
-    return True
+    return 
+
 
 def aid_year_match(year):
     global current_aid_year
@@ -381,6 +395,7 @@ def aid_year_match(year):
         return is_odd_year(year)
     else:
         return not is_odd_year(year)
+
 
 # Sort file into list depending on aid year
 def find_aid_year(filename):
@@ -423,6 +438,7 @@ def find_aid_year(filename):
         else:
             even_aid_years.append(str(filestring))
             move_files(filestring, current_aid_year)
+
     
 # Sort all files in directory into odd or even aid years
 def sort_files():
@@ -430,6 +446,11 @@ def sort_files():
     global test
     global unknown_list
 
+    # Old Version of File Select
+    #folder_path = Path(os.getcwd())
+    #for filename in os.listdir("."):
+    #    pFilename = Path(filename)
+    #    find_aid_year(pFilename)
 
     root = tkinter.Tk()    
     root.withdraw()
@@ -440,13 +461,8 @@ def sort_files():
     folder_path = directory
     for filename in os.listdir(directory):
         pFilename = Path(filename)
-        find_aid_year(pFilename)
+        find_aid_year(pFilename)   
 
-    # Old Version of File Select
-    #folder_path = Path(os.getcwd())
-    #for filename in os.listdir("."):
-    #    pFilename = Path(filename)
-    #    find_aid_year(pFilename)
 
 # User Input - Initialize Aid year and disbursement date
 def initialize(year, root):
@@ -467,6 +483,7 @@ def initialize(year, root):
         disbursement_date = disbursement_date.strftime("%m-%d-%y")
     if test:
         print("Disbursement Date: " + disbursement_date)
+
 
 def run(year, root):
     if test:
