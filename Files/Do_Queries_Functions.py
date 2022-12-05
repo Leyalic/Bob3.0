@@ -68,8 +68,8 @@ UOSFA_directory = Path("O:/UOSFA Reports")
 # Origination Filepaths
 test_dir_orig_folder = Path('C:/Testing Bob/Direct Loans/Origination')
 test_alt_orig_folder = Path('C:/Testing Bob/ALT Loans/')
-dir_orig_folder = Path('C:/Testing Bob/Direct Loans/Origination')
-alt_orig_folder = Path('C:/Testing Bob/Direct Loans/Origination')
+dir_orig_folder = Path('O:/Systems/Direct Loans/Origination')
+alt_orig_folder = Path('O:/Systems/QUERIES/ALT Loans')
 
 
 # Odd year
@@ -366,7 +366,7 @@ def move_alt_orig(filepath, dflt):
         source_folder = alt_orig_folder
         dest_folder = Path("O:/UOSFA Reports/Alternative Loan Reports")
 
-    renamed = date + "ALT Loan ORIG " + current_aid_year + ".doc" 
+    renamed = date + " ALT Loan ORIG " + current_aid_year + ".doc" 
 
     if (dflt):
         source_file = source_folder / Path(date + " ALT Loan ORIG " + current_aid_year + ".doc")

@@ -11,6 +11,10 @@ import tkinter.font as font
 from pathlib import Path
 import time
 
+###############################
+import os
+###############################
+
 year_valid = False
 term_valid = False
 
@@ -41,6 +45,8 @@ aid_year = ""
 date = time.strftime("%x").replace("/", "-")
 
 running_text = "Program running, please do not close the window"
+
+reset_visible = False
 
 #Adding widgets
 
@@ -260,7 +266,16 @@ class BobWindow(tk.Frame):
                 return False
         elif V == "focusin":
             return True
-        
+    
+#############################################################################################
+    def reset_test_folder(self):
+        direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+        for folder in os.listdir(direct):
+            path = direct / Path(folder)
+            for old_file in os.listdir(path):
+                os.remove(path / Path(old_file))
+#############################################################################################
+
 
     def __init__(self, win):
         tk.Frame.__init__(self, win)
@@ -288,6 +303,14 @@ class BobWindow(tk.Frame):
     
         self.exit_Button = Button(rootWindow, text="Exit Program", command=rootWindow.destroy)
         self.exit_Button.pack(side=BOTTOM, anchor="e", padx=8, pady=8)
+
+        #################################################################
+        #################################################################
+        if reset_visible:
+            self.reset_button = Button(rootWindow, text="Reset Test Folders", command=self.reset_test_folder)
+            self.reset_button.pack(side=BOTTOM, anchor="s", padx=8, pady=8)
+        #################################################################
+        #################################################################
 
         self.winfo_toplevel().title("Bob Window")
    
