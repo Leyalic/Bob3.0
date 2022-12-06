@@ -24,7 +24,7 @@ from Files import Direct_Loan
 from Files import Disbursement_Queries
 from Files import EndOfTerm_Queries
 from Files import Mid_Repack_Queries
-from Files import Monday_DailyQueries
+from Files import Monday_WeeklyQueries
 from Files import Monthly_Queries
 from Files import Packaging_Queries
 from Files import PrePackaging_Queries
@@ -237,7 +237,7 @@ def move_files(filename, year):
         info = Daily_Queries.do_dailies(test, date, year, filename, renamed)
 # Monday Weekly Queries
     if info == "Empty": 
-        info = Monday_DailyQueries.do_monday_weeklies(test, date, year, filename, renamed)
+        info = Monday_WeeklyQueries.do_monday_weeklies(test, date, year, filename, renamed)
 # Budget Queries
     if info == "Empty": 
         info = Budget_Queries.do_budget_queries(test, date, year, filename, renamed)
