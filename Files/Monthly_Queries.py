@@ -195,10 +195,10 @@ def do_monthlies(test, date, year, query, renamed):
         return (query, renamed, directory, move_directory)
 
     if "ussfa037" in query :
-        return (query, renamed, t_directory, award_directory)
+        return (query, query, t_directory, award_directory)
 
     if "ussfa035-" in query :
-        return (query, renamed, t_directory, award_directory)
+        return (query, query, t_directory, award_directory)
 
     if "MR_EXPIRED_MPN_CURR_LN" in query :
         return (query, renamed, directory, move_directory)
