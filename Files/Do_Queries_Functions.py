@@ -2,6 +2,7 @@
 from genericpath import isfile
 import os
 import re
+import xlrd
 import openpyxl
 import datetime
 import time
@@ -57,6 +58,7 @@ rootWindow = ""
 select_window = ""
 
 aid_year_regex = ["Aid[\s]?Y(ea)?r"]
+aid_num_regex = ["[0-9]{2,4}\s*$"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
 
 # Directories
@@ -77,6 +79,15 @@ def is_odd_year(year):
     year_int = int(year[-1])
     return year_int % 2 == 1
 
+def is_aid_year_word(value):
+    return any (re.match(regex_str, str(value), re.IGNORECASE) for regex_str in aid_year_regex)
+
+def is_aid_year_num(value):
+    return any (re.match(regex_str, str(value)) for regex_str in aid_num_regex)
+
+def is_date(value):
+    return any (re.match(regex_str, str(value)) for regex_str in date_regex)
+
 
 # Search for and return aid year in filename
 def has_aid_year(filename):
@@ -87,6 +98,45 @@ def has_aid_year(filename):
     if found_year:
         has = True
         year = "20" + found_year.group()[1:-1]
+    return (has, year)
+
+
+def search_xls_file(filename):
+    global folder_path
+    has = False
+    year = "0"
+
+    fullpath = folder_path / filename
+    workbook = xlrd.open_workbook(fullpath)
+    sheet = workbook.sheet_by_index(0)
+    
+    for row in range(sheet.nrows):
+        for col in range(sheet.ncols):
+            value = sheet.cell_value(row, col)
+            if is_aid_year_word(value):
+                if is_aid_year_num(value):
+                    has = True
+                    year = "20" +  str(value)[-2:] 
+                    workbook.release_resources()
+                    return (has, year)
+                elif is_date(value):
+                    has = True
+                    year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
+                    workbook.release_resources()
+                    return (has, year)
+
+                lower_value = sheet.cell_value(row + 1, col)
+                if is_aid_year_num(lower_value):
+                    has = True
+                    year = "20" +  str(lower_value)[-2:]
+                    workbook.release_resources()
+                    return (has, year)
+                elif is_date(lower_value):
+                    has = True
+                    year = "20" +  str(lower_value)[-2:] # Assumes date format w/ year at end
+                    workbook.release_resources()
+                    return (has, year)
+    workbook.release_resources()
     return (has, year)
 
 
@@ -102,18 +152,31 @@ def search_excel_file(filename):
     
     for row in sheet.rows:
         for cell in row:
-            if any (re.match(regex_str, str(cell.value), re.IGNORECASE) for regex_str in aid_year_regex):
-                has = True
-                year = "20" +  str(cell.value)[-2:]
-                workbook.close()
-                return (has, year)
-            if cell.value is not None and cell.is_date:
-                has = True
-                year = str(cell.value.year)
-                if len(str(year)) < 4:
-                    year = "20" + year[-2:]
-                workbook.close()
-                return (has, year)
+            value = str(cell.value)
+            if is_aid_year_word(value):
+                if is_aid_year_num(value):
+                    has = True
+                    year = "20" +  str(value)[-2:]
+                    workbook.close()
+                    return (has, year)
+                elif is_date(value):
+                    has = True
+                    year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
+                    workbook.close()
+                    return (has, year)
+
+            lower_value = sheet.cell(cell.row_idx + 1, cell.col_idx)
+            if is_aid_year_word(lower_value):
+                if is_aid_year_num(lower_value):
+                    has = True
+                    year = "20" +  str(lower_value)[-2:]
+                    workbook.close()
+                    return (has, year)
+                elif is_date(lower_value):
+                    has = True
+                    year = "20" +  str(lower_value)[-2:] # Assumes date format w/ year at end
+                    workbook.close()
+                    return (has, year)
     workbook.close()
     return (has, year)
 
@@ -413,7 +476,22 @@ def find_aid_year(filename):
         else:
             even_aid_years.append(str(filestring))
             move_files(filestring, file_year[1])
-
+    elif filestring.lower().endswith("xls"):
+        file_year = search_xls_file(filename)
+        if file_year[0]:
+            if is_odd_year(file_year[1]):
+                odd_aid_years.append(str(filestring))
+                move_files(filestring, file_year[1])
+            else:
+                even_aid_years.append(str(filestring))
+                move_files(filestring, file_year[1])
+        else: # Default for spreadsheets is current year
+            if is_odd_year(current_aid_year):
+                odd_aid_years.append(str(filestring))
+                move_files(filestring, current_aid_year)
+            else:
+                even_aid_years.append(str(filestring))
+                move_files(filestring, current_aid_year)
     elif filestring.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
         file_year = search_excel_file(filename) # file_year: (bool has_year, str year)
         if file_year[0]:
