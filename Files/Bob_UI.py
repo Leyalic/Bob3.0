@@ -46,7 +46,7 @@ date = time.strftime("%x").replace("/", "-")
 
 running_text = "Program running, please do not close the window"
 
-reset_visible = True
+reset_visible = False
 
 #Adding widgets
 
