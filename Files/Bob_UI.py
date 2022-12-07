@@ -46,7 +46,7 @@ date = time.strftime("%x").replace("/", "-")
 
 running_text = "Program running, please do not close the window"
 
-reset_visible = False
+reset_visible = True
 
 #Adding widgets
 
@@ -269,7 +269,9 @@ class BobWindow(tk.Frame):
     
 #############################################################################################
     def reset_test_folder(self):
-        direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+        #direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+        direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+
         for folder in os.listdir(direct):
             path = direct / Path(folder)
             for old_file in os.listdir(path):
