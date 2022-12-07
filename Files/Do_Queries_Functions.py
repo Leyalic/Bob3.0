@@ -107,7 +107,7 @@ def search_xls_file(filename):
     year = "0"
 
     fullpath = folder_path / filename
-    workbook = xlrd.open_workbook(fullpath)
+    workbook = xlrd.open_workbook(fullpath, logfile=open(os.devnull, 'w'))
     sheet = workbook.sheet_by_index(0)
     
     for row in range(sheet.nrows):
@@ -125,17 +125,18 @@ def search_xls_file(filename):
                     workbook.release_resources()
                     return (has, year)
 
-                lower_value = sheet.cell_value(row + 1, col)
-                if is_aid_year_num(lower_value):
-                    has = True
-                    year = "20" +  str(lower_value)[-2:]
-                    workbook.release_resources()
-                    return (has, year)
-                elif is_date(lower_value):
-                    has = True
-                    year = "20" +  str(lower_value)[-2:] # Assumes date format w/ year at end
-                    workbook.release_resources()
-                    return (has, year)
+                if row + 1 < sheet.nrows:
+                    lower_value = sheet.cell_value(row + 1, col)
+                    if is_aid_year_num(lower_value):
+                        has = True
+                        year = "20" +  str(lower_value)[-2:]
+                        workbook.release_resources()
+                        return (has, year)
+                    elif is_date(lower_value):
+                        has = True
+                        year = "20" +  str(lower_value)[-2:] # Assumes date format w/ year at end
+                        workbook.release_resources()
+                        return (has, year)
     workbook.release_resources()
     return (has, year)
 
