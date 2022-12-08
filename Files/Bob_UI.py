@@ -62,8 +62,10 @@ class BobWindow(tk.Frame):
     # Prompt user to select origination file
     def create_orig_window(filename, pathname):
         global orig_window
+        global orig_path
+        orig_path = None
         orig_window = Toplevel(rootWindow)
-        orig_window.grab_set(); # Disable interacting with root
+        #orig_window.grab_set(); # Disable interacting with root
 
         prompt1 = "Could not locate the following file:"
         prompt2 = filename
@@ -131,7 +133,7 @@ class BobWindow(tk.Frame):
         global select_window
         select_window = Toplevel(rootWindow)
         
-        select_window.grab_set(); # Disable interacting with root
+        #select_window.grab_set(); # Disable interacting with root
 
         x_loc = rootWindow.winfo_x()
         y_loc = rootWindow.winfo_y()
@@ -269,8 +271,8 @@ class BobWindow(tk.Frame):
     
 #############################################################################################
     def reset_test_folder(self):
-        #direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
-        direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+        direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+        #direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
 
         for folder in os.listdir(direct):
             path = direct / Path(folder)
@@ -298,14 +300,7 @@ class BobWindow(tk.Frame):
         self.run_label = Label(win, text="", fg='red', font=("Times New Roman bold", 13)) 
         self.run_label.place(x=260, y=375)
 
-        #Create a button in the main Window to open the popup
- 
-        self.b1=Button(win, text="Run", font=('Helvatical bold',12), bd="4", command=self.open_popup, height=2, width=10)
-        self.b1.pack(side=BOTTOM, anchor="center",padx=18, pady=18)
-    
-        self.exit_Button = Button(rootWindow, text="Exit Program", command=rootWindow.destroy)
-        self.exit_Button.pack(side=BOTTOM, anchor="e", padx=8, pady=8)
-
+        
         #################################################################
         #################################################################
         if reset_visible:
@@ -313,6 +308,16 @@ class BobWindow(tk.Frame):
             self.reset_button.pack(side=BOTTOM, anchor="s", padx=8, pady=8)
         #################################################################
         #################################################################
+
+
+        #Create a button in the main Window to open the popup
+        self.b1=Button(win, text="Run", font=('Helvatical bold',12), bd="4", command=self.open_popup, height=2, width=10)
+        self.b1.pack(side=BOTTOM, anchor="center",padx=18, pady=18)
+    
+        self.exit_Button = Button(rootWindow, text="Exit Program", command=rootWindow.destroy)
+        self.exit_Button.pack(side=BOTTOM, anchor="e", padx=8, pady=8)
+
+        
 
         self.winfo_toplevel().title("Bob Window")
    

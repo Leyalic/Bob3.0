@@ -62,9 +62,9 @@ aid_num_regex = ["[0-9]{2,4}\s*$"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
 
 # Directories
-test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+#test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
 #test_UOSFA_directory = Path("O:/UOSFA Reports")
-#test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
 
 UOSFA_directory = Path("O:/UOSFA Reports")
 
@@ -110,11 +110,16 @@ def search_xls_file(filename):
     fullpath = folder_path / filename
     workbook = xlrd.open_workbook(fullpath, logfile=open(os.devnull, 'w'))
     sheet = workbook.sheet_by_index(0)
+    aid_col = -1
+    aid_row = -1
+    max_year = 0
     
     for row in range(sheet.nrows):
         for col in range(sheet.ncols):
             value = sheet.cell_value(row, col)
             if is_aid_year_word(value):
+                aid_col = col
+                aid_row = row
                 if is_aid_year_num(value):
                     has = True
                     year = "20" +  str(value)[-2:] 
@@ -125,19 +130,24 @@ def search_xls_file(filename):
                     year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
                     workbook.release_resources()
                     return (has, year)
-
-                if row + 1 < sheet.nrows:
-                    lower_value = sheet.cell_value(row + 1, col)
-                    if is_aid_year_num(lower_value):
-                        has = True
-                        year = "20" +  str(lower_value)[-2:]
-                        workbook.release_resources()
-                        return (has, year)
-                    elif is_date(lower_value):
-                        has = True
-                        year = "20" +  str(lower_value)[-2:] # Assumes date format w/ year at end
-                        workbook.release_resources()
-                        return (has, year)
+    
+    if aid_col > -1:
+        curr_row = aid_row
+        while (curr_row < sheet.nrows):
+            value = str(sheet.cell_value(curr_row, aid_col))
+            if is_aid_year_num(value):
+                value_int = int(value[-2:])
+                if value_int > max_year:
+                    max_year = value_int
+                    has = True
+                    year = "20" +  str(value)[-2:]
+            elif is_date(value):
+                value_int = int(value[-2:])
+                if value_int > max_year:
+                    max_year = value_int
+                    has = True
+                    year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
+            curr_row = curr_row + 1
     workbook.release_resources()
     return (has, year)
 
@@ -186,14 +196,23 @@ def search_excel_file(filename):
 # Prints list of sorted files to terminal
 # **(For use when debugging)**
 def output_sorted_files():
+    print("Num Odds = " + str(len(odd_aid_years)))
     print("Odds: ")
     for filename in odd_aid_years:
         print("- " + filename)
-    print("")
+    print()
+
+    print("Num Evens = " + str(len(even_aid_years)))
     print("Evens: ")
     for filename in even_aid_years:
         print("- " + filename)
-    print("")
+    print()
+
+    print("Num Unknown = " + str(len(unknown_list)))
+    print("Unknown: ")
+    for filename in unknown_list:
+        print("- " + filename)
+    print()
 
 
 # Renames file to ensure no duplicates at desired location
@@ -285,6 +304,8 @@ def new_name_disb(name, year):
 # Move files to corresponding directory
 def move_files(filename, year):
     global current_aid_year
+    global odd_aid_years
+    global even_aid_years
     global unknown_list
     global disbursement_date
     global alt_loan_flag
@@ -359,6 +380,10 @@ def move_files(filename, year):
     if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
         os.remove(folder_path / Path(filename))
         print("Removed " + filename)
+        if is_odd_year(year):
+            odd_aid_years.remove(filename)
+        else:
+            even_aid_years.remove(filename)
         info = "Removed"
 # Transfer Student Monitoring
     if info == "Empty": 
@@ -469,6 +494,8 @@ def find_aid_year(filename):
     global even_aid_years
 
     filestring = str(filename)
+    if ".zip" in filestring:
+        return
 
     file_year = has_aid_year(filestring)
     if file_year[0]:
