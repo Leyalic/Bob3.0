@@ -34,8 +34,9 @@ from Files import Second_LDR
 from Files import Tsm_Queries
 
 
-test = False
+global test
 
+skip_files = [".zip", " DL ORIG ", " ALT Loan ORIG "]
 
 # The date becomes the current date and is then placed in MM-DD-YY format
 date = time.strftime("%x").replace("/", "-")
@@ -54,8 +55,6 @@ disbursement_date = datetime.datetime.min
 alt_loan_flag = False
 direct_loan_flag = False
 
-rootWindow = ""
-select_window = ""
 
 aid_year_regex = ["Aid[\s]?Y(ea)?r"]
 aid_num_regex = ["[0-9]{2,4}\s*$"]
@@ -347,7 +346,7 @@ def move_files(filename, year):
         info = Day_AfterLDR.do_day_after_ldr(test, year, filename, renamed)
 # Direct Loans Pre-Outbound Queries
     if info == "Empty": 
-        info = Direct_Loan.dl_pre_outbound(test, filename, renamed)
+        info = Direct_Loan.dl_pre_outbound(test, date, year, filename, renamed)
         if info != "Empty":
             direct_loan_flag = True # Notify that ORIG file must be moved
 ## Alternative Loan Pre-Outbound Queries
@@ -494,7 +493,7 @@ def find_aid_year(filename):
     global even_aid_years
 
     filestring = str(filename)
-    if ".zip" in filestring:
+    if any(word in filestring for word in skip_files):
         return
 
     file_year = has_aid_year(filestring)
@@ -572,13 +571,22 @@ def sort_files():
 
 
 # User Input - Initialize Aid year and disbursement date
-def initialize(year, root):
+def initialize(year, is_test):
     global current_aid_year
     global STerm
     global disbursement_date
-    global rootWindow
+    global alt_loan_flag
+    global direct_loan_flag
+    global folder_path
+    global test
 
-    rootWindow = root
+    test = is_test
+
+    folder_path = Path()
+
+    alt_loan_flag = False
+    direct_loan_flag = False
+
 
     current_aid_year = year
     today = datetime.date.today()
@@ -592,15 +600,15 @@ def initialize(year, root):
         print("Disbursement Date: " + disbursement_date)
 
 
-def run(year, root):
-    if test:
-        initialize(year, root)
+def run(year, is_test):
+    if is_test:
+        initialize(year, is_test)
         sort_files()
         output_sorted_files()
         print("Done")
         
     else:
-        initialize(year, root)
+        initialize(year, is_test)
         sort_files()
 
     return (direct_loan_flag, alt_loan_flag, unknown_list)
