@@ -46,7 +46,7 @@ date = time.strftime("%x").replace("/", "-")
 
 running_text = "Program running, please do not close the window"
 
-reset_visible = True
+test = True
 
 #Adding widgets
 
@@ -202,6 +202,10 @@ class BobWindow(tk.Frame):
         global alt_loan_flag
         global unknown_list
 
+        direct_loan_flag = False
+        alt_loan_flag = False
+        unknown_list = []
+
         if year_valid:
 
             self.exit_Button["state"] = "disabled"
@@ -210,7 +214,7 @@ class BobWindow(tk.Frame):
             self.run_label["text"] = running_text
 
             aid_year = self.t1.get()           
-            direct_loan_flag, alt_loan_flag, unknown_list = Do_Queries_Functions.run(self.t1.get(), rootWindow)
+            direct_loan_flag, alt_loan_flag, unknown_list = Do_Queries_Functions.run(self.t1.get(), test)
 
             if len(unknown_list) > 0:
                 # Disable all window input here
@@ -271,8 +275,8 @@ class BobWindow(tk.Frame):
     
 #############################################################################################
     def reset_test_folder(self):
-        direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
-        #direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+        #direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+        direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
 
         for folder in os.listdir(direct):
             path = direct / Path(folder)
@@ -303,7 +307,7 @@ class BobWindow(tk.Frame):
         
         #################################################################
         #################################################################
-        if reset_visible:
+        if test:
             self.reset_button = Button(rootWindow, text="Reset Test Folders", command=self.reset_test_folder)
             self.reset_button.pack(side=BOTTOM, anchor="s", padx=8, pady=8)
         #################################################################
