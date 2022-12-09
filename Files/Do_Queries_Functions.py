@@ -610,6 +610,8 @@ def run(year, is_test):
     else:
         initialize(year, is_test)
         sort_files()
+        output_sorted_files()
+        print("Done")
 
     return (direct_loan_flag, alt_loan_flag, unknown_list)
         

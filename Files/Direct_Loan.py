@@ -13,6 +13,7 @@ def dl_pre_outbound(test, date, year, query, renamed):
 
     move_directory = "Direct Loan Reports"
 
+    # For underscores - to be removed/commented when the DL process is automated
     dot_index = query.rfind(".")
     right_index = query.rfind("_")
     aidyear_index = query.rfind("_", 0, right_index)
