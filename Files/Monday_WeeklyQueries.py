@@ -27,9 +27,9 @@ def do_monday_weeklies(test, date, year, query, renamed):
         os.makedirs(save_directory)
 
     move_directory = "Weekly Reports"
-    pack_directory = "Packaging Reports"
-    disb_directory = "Weekly Reports"
-    other_directory = "Weekly Reports"
+    move_pack_directory = "Packaging Reports"
+    move_disb_directory = "Weekly Reports"
+    move_save_directory = "Weekly Reports"
     
     # FORMAT: return (query, renamed, archive_directory, UOSFA_folder)
     # query: The original file name
@@ -94,7 +94,7 @@ def do_monday_weeklies(test, date, year, query, renamed):
         return (query, renamed, directory, move_directory)
 
     if "_WR_DISB_ATH_FAILURE" in query :
-        return (query, renamed, disb_failure_directory, disb_directory)
+        return (query, renamed, disb_failure_directory, move_disb_directory)
 
     if "_WR_DL_DISBURSED_LTHT" in query :
         return (query, renamed, directory, move_directory)
@@ -419,13 +419,13 @@ def do_monday_weeklies(test, date, year, query, renamed):
         return (query, renamed, directory, move_directory)
 
     if "WR_SAVE_CTZNSHIP_VER" in query :
-        return (query, renamed, save_directory, other_directory)
+        return (query, renamed, save_directory, move_save_directory)
 
     if "WR_ALL_C_FVRA_I_NO_COR" in query :
-        return (query, renamed, save_directory, other_directory)
+        return (query, renamed, save_directory, move_save_directory)
 
     if "WR_CORRECTION_NOT_SENT" in query :
-        return (query, renamed, save_directory, other_directory)
+        return (query, renamed, save_directory, move_save_directory)
 
     # Manually run Queries
     if "_WR_LOAN_EFT_DETAIL_ERROR" in query:
@@ -442,15 +442,18 @@ def do_monday_weeklies(test, date, year, query, renamed):
 
     # Packaging queries that are being manually run.
     if "PRT_ATH_ACCEPT_FED_AID" in query :
-        return (query, renamed, packaging_directory, pack_directory)
+        return (query, renamed, packaging_directory, move_pack_directory)
 
     if "PRT_ATH_AWD_CBA_GRANT" in query :
-        return (query, renamed, packaging_directory, pack_directory)
+        return (query, renamed, packaging_directory, move_pack_directory)
 
     if "PRT_ATHLETE_GRAD_DATE" in query :
-        return (query, renamed, packaging_directory, pack_directory)
+        return (query, renamed, packaging_directory, move_pack_directory)
 
     if "PRT_ATH_OFFERED_FED_AID" in query :
-        return (query, renamed, packaging_directory, pack_directory)
+        return (query, renamed, packaging_directory, move_pack_directory)
+
+    if "UUFA_WR_TSM_ALERTS" in query :
+        return (query, renamed, directory, move_directory)
 
     return "Empty" #Leave as last line

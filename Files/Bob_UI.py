@@ -1,13 +1,19 @@
 #Created by Iman Essaghir and Joshua Hardy
+import sys
+sys.path.insert(1, '../Files/')
+from Files import Do_Queries_Functions
 
 from fileinput import filename
 import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
 import tkinter.font as font
-import Do_Queries_Functions
 from pathlib import Path
 import time
+
+###############################
+import os
+###############################
 
 year_valid = False
 term_valid = False
@@ -40,6 +46,8 @@ date = time.strftime("%x").replace("/", "-")
 
 running_text = "Program running, please do not close the window"
 
+test = True
+
 #Adding widgets
 
 class BobWindow(tk.Frame):
@@ -54,8 +62,10 @@ class BobWindow(tk.Frame):
     # Prompt user to select origination file
     def create_orig_window(filename, pathname):
         global orig_window
+        global orig_path
+        orig_path = None
         orig_window = Toplevel(rootWindow)
-        orig_window.grab_set(); # Disable interacting with root
+        #orig_window.grab_set(); # Disable interacting with root
 
         prompt1 = "Could not locate the following file:"
         prompt2 = filename
@@ -123,7 +133,7 @@ class BobWindow(tk.Frame):
         global select_window
         select_window = Toplevel(rootWindow)
         
-        select_window.grab_set(); # Disable interacting with root
+        #select_window.grab_set(); # Disable interacting with root
 
         x_loc = rootWindow.winfo_x()
         y_loc = rootWindow.winfo_y()
@@ -174,14 +184,14 @@ class BobWindow(tk.Frame):
                 unknown_list.remove(filename)
                 continue
 
-            print("Moved to " + folder_option)
+            #("Moved to " + folder_option)
 
             # Move file to selected folder
             renamed = Do_Queries_Functions.new_name(filename, aid_year)           
             Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option)
             unknown_list.remove(filename)
 
-        print("All Unknown Files Handled")
+        #print("All Unknown Files Handled")
 
         return done
 
@@ -192,6 +202,10 @@ class BobWindow(tk.Frame):
         global alt_loan_flag
         global unknown_list
 
+        direct_loan_flag = False
+        alt_loan_flag = False
+        unknown_list = []
+
         if year_valid:
 
             self.exit_Button["state"] = "disabled"
@@ -200,7 +214,7 @@ class BobWindow(tk.Frame):
             self.run_label["text"] = running_text
 
             aid_year = self.t1.get()           
-            direct_loan_flag, alt_loan_flag, unknown_list = Do_Queries_Functions.run(self.t1.get(), rootWindow)
+            direct_loan_flag, alt_loan_flag, unknown_list = Do_Queries_Functions.run(self.t1.get(), test)
 
             if len(unknown_list) > 0:
                 # Disable all window input here
@@ -208,7 +222,7 @@ class BobWindow(tk.Frame):
                 BobWindow.handle_unknown_files()
                 # Re-enable all window input here
                 
-                print("Process Completed")
+                #print("Process Completed")
 
             if direct_loan_flag:
                 BobWindow.run_direct_orig()
@@ -258,7 +272,18 @@ class BobWindow(tk.Frame):
                 return False
         elif V == "focusin":
             return True
-        
+    
+#############################################################################################
+    def reset_test_folder(self):
+        #direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+        direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+
+        for folder in os.listdir(direct):
+            path = direct / Path(folder)
+            for old_file in os.listdir(path):
+                os.remove(path / Path(old_file))
+#############################################################################################
+
 
     def __init__(self, win):
         tk.Frame.__init__(self, win)
@@ -279,18 +304,32 @@ class BobWindow(tk.Frame):
         self.run_label = Label(win, text="", fg='red', font=("Times New Roman bold", 13)) 
         self.run_label.place(x=260, y=375)
 
+        
+        #################################################################
+        #################################################################
+        if test:
+            self.reset_button = Button(rootWindow, text="Reset Test Folders", command=self.reset_test_folder)
+            self.reset_button.pack(side=BOTTOM, anchor="s", padx=8, pady=8)
+        #################################################################
+        #################################################################
+
+
         #Create a button in the main Window to open the popup
- 
         self.b1=Button(win, text="Run", font=('Helvatical bold',12), bd="4", command=self.open_popup, height=2, width=10)
         self.b1.pack(side=BOTTOM, anchor="center",padx=18, pady=18)
     
         self.exit_Button = Button(rootWindow, text="Exit Program", command=rootWindow.destroy)
         self.exit_Button.pack(side=BOTTOM, anchor="e", padx=8, pady=8)
 
+        
+
         self.winfo_toplevel().title("Bob Window")
    
-        #win.mainloop()
+def main():
+    global myWin
+    global rootWindow
+    myWin=BobWindow(rootWindow)
+    rootWindow.mainloop()
 
-myWin=BobWindow(rootWindow)
-
-rootWindow.mainloop()
+if __name__ == "__main__":
+    main()

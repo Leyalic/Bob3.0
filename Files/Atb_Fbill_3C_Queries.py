@@ -77,6 +77,15 @@ def do_atb_fb_3c_queries(test, query, renamed):
     if ("UUFA_GED_07_AFTER_ATB" in query):
         return (query, renamed, atb_directory, atb_move_directory)
 
+    if ("UUFA_GED_07_AFTER_SEC" in query):
+        return (query, renamed, atb_directory, atb_move_directory)
+
+    if ("UUFA_HS_04_AFTER_SEC" in query):
+        return (query, renamed, atb_directory, atb_move_directory)
+    
+    if ("UUFA_HS_06_AFTER_SEC" in query):
+        return (query, renamed, atb_directory, atb_move_directory)
+
     if ("UUFA_ATB_ISIR_NOT_MATCH" in query):
         return (query, renamed, atb_directory, atb_move_directory)
 

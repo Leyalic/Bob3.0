@@ -260,6 +260,18 @@ def do_dailies(test, date, year, query, renamed):
     if "IL_ISIR_SSN_MISMATCH" in query :
         return (query, renamed, disb_directory, move_directory)
 
+    if "UUFA_IL_FCLVER_C_NO_OVERIDE" in query :
+        return (query, renamed, archive_directory, move_directory)
+
+    if "UUFA_IL_FDEGRX_FABCX_FBLKD" in query :
+        return (query, renamed, archive_directory, move_directory)
+
+    if "UUFA_IL_FOVPEL_INITIATED" in query :
+        return (query, renamed, archive_directory, move_directory)
+
+    if "UUFA_IL_OUTSIDE_RESOURCES" in query :
+        return (query, renamed, archive_directory, move_directory)
+
     return "Empty" #Leave as last line
 
 
