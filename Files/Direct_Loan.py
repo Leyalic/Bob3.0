@@ -1,7 +1,7 @@
 # Direct Loan Pre-Outbound Queries
 import os   
 
-def dl_pre_outbound(test, query, renamed):
+def dl_pre_outbound(test, date, year, query, renamed):
 
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob/Direct Loans', 'DL Pre-Outbound'))       
@@ -12,6 +12,11 @@ def dl_pre_outbound(test, query, renamed):
         os.makedirs(directory)
 
     move_directory = "Direct Loan Reports"
+
+    dot_index = query.rfind(".")
+    right_index = query.rfind("_")
+    aidyear_index = query.rfind("_", 0, right_index)
+    renamed = date + " " + query[:aidyear_index] + " " + year[2:] + query[dot_index:]
 
     # FORMAT: return (query, renamed, archive_directory, UOSFA_folder)
     # query: The original file name
