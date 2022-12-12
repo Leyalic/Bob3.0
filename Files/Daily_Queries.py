@@ -19,6 +19,7 @@ def do_dailies(test, date, year, query, renamed):
         pell_directory = os.path.realpath(os.path.join('O:\Systems\QUERIES\Pell Repackaging', aid_year))
         disb_directory = os.path.realpath("O:\Systems\QUERIES\Disbursement\Pre-Disbursement Queries")
         refund_directory = os.path.realpath(os.path.join('O:\Systems\QUERIES\Refund Credit Holds', month_folder))
+        daily_ea_directory = os.path.realpath("O:\Systems\External Awards\External Award Queries")
 
 
     if not os.path.isdir(archive_directory):
@@ -31,9 +32,13 @@ def do_dailies(test, date, year, query, renamed):
         os.makedirs(disb_directory)
     if not os.path.isdir(refund_directory):
         os.makedirs(refund_directory)
+    if not os.path.isdir(daily_ea_directory):
+        os.makedirs(daily_ea_directory)
 
     move_directory = "Daily Reports"
     move_pell_directory = "Pell Reports"
+    move_daily_ea = "External Award Reports"
+    
 
     # FORMAT: return (query, renamed, archive_directory, UOSFA_folder)
     # query: The original file name
@@ -170,11 +175,7 @@ def do_dailies(test, date, year, query, renamed):
         return (query, renamed, archive_directory, move_directory)
 
     if query.startswith("UUFA_IL_FHST_I_HST_COMPLETE") :
-        return (query, renamed, archive_directory, move_directory)
-
-    #if query.startswith("ussf0034"): # Leave this one commented out?
-    #    do_query(query, date + " " + query, refund_directory,
-    #             aehjkkt_mail.attachments) 
+        return (query, renamed, archive_directory, move_directory) 
 
     if query.startswith("UUFA_REFUND_HOLDS"):
         return (query, renamed, refund_directory, move_directory)
@@ -271,6 +272,18 @@ def do_dailies(test, date, year, query, renamed):
 
     if "UUFA_IL_OUTSIDE_RESOURCES" in query :
         return (query, renamed, archive_directory, move_directory)
+
+    if "UUFA_EA_SCH_4UT_FS_23" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
+
+    if "UUFA_EA_SCH79PCT_FS_NO_ATH_23" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
+
+    if "UUFA_EA_SCH_ATH_FS_23" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
+
+    if "UUFA_SCHADM_DUALCAR" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
 
     return "Empty" #Leave as last line
 
