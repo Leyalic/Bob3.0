@@ -59,6 +59,7 @@ direct_loan_flag = False
 aid_year_regex = ["Aid[\s]?Y(ea)?r"]
 aid_num_regex = ["[0-9]{2,4}\s*$"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
+instance_regex = r"[_-][0-9_-]+\."
 
 # Directories
 test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
@@ -270,18 +271,35 @@ def new_name(name, year):
     renamed = ""
     if hay_result[0]:
         dot_index = name.find(".")
-        dash_index = name.rfind("-")
-        if dash_index > -1:
-            renamed = date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
+        #dash_index = name.rfind("-")
+        #if dash_index > -1:
+        #    renamed = date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
+        #else:
+        #    renamed = date + " " + name[:(dot_index - 3)] + " " + year[2:] + name[dot_index:]
+        res = re.search(instance_regex, name)
+        instance_index = -1
+        if res is not None:
+            instance_index = res.start()
+        if instance_index > -1:
+            renamed = date + " " + name[:(instance_index)] + " " + year[2:] + name[dot_index:]
         else:
             renamed = date + " " + name[:(dot_index - 3)] + " " + year[2:] + name[dot_index:]
+
     else:
         dot_index = name.find(".")
-        dash_index = name.rfind("-")
-        if dash_index > -1:
-            renamed = date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
+        #dash_index = name.rfind("-")
+        #if dash_index > -1:
+        #    renamed = date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
+        #else:
+        #    renamed = date + " " + name[:dot_index] + " " + year[2:] + name[dot_index:]
+        res = re.search(instance_regex, name)
+        instance_index = -1
+        if res is not None:
+            instance_index = res.start()
+        if instance_index > -1:
+            renamed = date + " " + name[:(instance_index)] + " " + year[2:] + name[dot_index:]
         else:
-            renamed = date + " " + name[:dot_index] + " " + year[2:] + name[dot_index:]
+            renamed = date + " " + name[:(dot_index)] + " " + year[2:] + name[dot_index:]
     return renamed
 
 
@@ -291,12 +309,28 @@ def new_name_disb(name, year):
     renamed = ""
     if hay_result[0]:
         dot_index = name.find(".")
-        dash_index = name.rfind("-")
-        renamed = disbursement_date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
+        #dash_index = name.rfind("-")
+        #renamed = disbursement_date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
+        res = re.search(instance_regex, name)
+        instance_index = -1
+        if res is not None:
+            instance_index = res.start()
+        if instance_index > -1:
+            renamed = disbursement_date + " " + name[:(instance_index)] + " " + year[2:] + name[dot_index:]
+        else:
+            renamed = disbursement_date + " " + name[:(dot_index - 3)] + " " + year[2:] + name[dot_index:]
     else:
         dot_index = name.find(".")
-        dash_index = name.rfind("-")
-        renamed = disbursement_date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
+        #dash_index = name.rfind("-")
+        #renamed = disbursement_date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
+        res = re.search(instance_regex, name)
+        instance_index = -1
+        if res is not None:
+            instance_index = res.start()
+        if instance_index > -1:
+            renamed = disbursement_date + " " + name[:(instance_index)] + " " + year[2:] + name[dot_index:]
+        else:
+            renamed = disbursement_date + " " + name[:(dot_index)] + " " + year[2:] + name[dot_index:]
     return renamed
 
 
@@ -340,7 +374,7 @@ def move_files(filename, year):
         info = Second_LDR.do_2nd_ldr(test, year, filename, renamed)
 # End of Term Queries
     if info == "Empty": 
-        info = EndOfTerm_Queries.do_end_of_term_queries(test, year, filename, renamed)
+        info = EndOfTerm_Queries.do_end_of_term_queries(test, date, year, filename, renamed)
 # Day After LDR Queries
     if info == "Empty":
         info = Day_AfterLDR.do_day_after_ldr(test, year, filename, renamed)
@@ -475,7 +509,7 @@ def move_alt_orig(filepath, dflt):
                 shutil.copy(source_filex, dest_filex)
             except FileNotFoundError as e:
                 return False
-    return 
+    return True
 
 
 def aid_year_match(year):

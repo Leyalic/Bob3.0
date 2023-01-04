@@ -7,6 +7,8 @@ def dl_pre_outbound(test, date, year, query, renamed):
         directory = os.path.realpath(os.path.join('C:\Testing Bob/Direct Loans', 'DL Pre-Outbound'))       
     else:
         directory = os.path.realpath(os.path.join('O:/Systems/Direct Loans', 'DL Pre-Outbound'))
+        heal_directory = os.path.realpath(os.path.join('O:/Systems/Direct Loans', 'DL HEAL Flag'))
+        response_directory = os.path.realpath(os.path.join('O:/Systems/Direct Loans', 'DL Response Files'))
        
     if not os.path.isdir(directory):
         os.makedirs(directory)
@@ -26,6 +28,12 @@ def dl_pre_outbound(test, date, year, query, renamed):
     # UOSFA_folder: The name of the folder the renamed file should be moved to
     # - (eg. "Budget Reports", "SAP Reports", "Unknown Reports") 
     # - put "None" if it shouldn't be moved to a folder in 'O:/UOSFA Reports/'
+
+    if query.startswith("UUFA_DL_COD_EDITS"):
+        return (query, renamed, response_directory, move_directory)
+
+    if query.startswith("UUFA_DLO_PRORATION_ENROLL"):
+        return (query, renamed, heal_directory, move_directory)
 
     if query.startswith("UUFA_DLR_ORIG_TRNS_PEND"):
         return (query, renamed, directory, move_directory)

@@ -39,6 +39,9 @@ def do_monday_weeklies(test, date, year, query, renamed):
     # - (eg. "Budget Reports", "SAP Reports", "Unknown Reports") 
     # - put "None" if it shouldn't be moved to a folder in 'O:/UOSFA Reports/'
     
+    if "UUFA_UOSFA_1690_LN_TYPES" in query :
+        return (query, renamed, directory, move_directory)
+
     if "_WR_ACAD_LVLS_OUT_SYNC" in query :
         return (query, renamed, directory, move_directory)
 

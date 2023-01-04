@@ -13,6 +13,7 @@ def do_dailies(test, date, year, query, renamed):
         pell_directory = os.path.realpath(os.path.join('C:\Testing Bob/QUERIES\Pell Repackaging', aid_year))
         disb_directory = os.path.realpath('C:\Testing Bob\QUERIES\Disbursement\Pre-Disbursement Queries')
         refund_directory = os.path.realpath(os.path.join('C:\Testing Bob/QUERIES\Refund Credit Holds', month_folder))
+        daily_ea_directory = os.path.realpath("O:\Testing Bob\External Awards\External Award Queries")
     else:
         archive_directory = os.path.realpath(os.path.join('O:/Systems/QUERIES/Daily', aid_year, month_folder))
         royall_directory = os.path.realpath('O:/Systems/Royall')

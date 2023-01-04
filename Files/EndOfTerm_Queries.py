@@ -1,7 +1,7 @@
 # End of Term Queries
 import os
 
-def do_end_of_term_queries(test, year, query, renamed):
+def do_end_of_term_queries(test, date, year, query, renamed):
 
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob/SAP/', year))
@@ -13,6 +13,11 @@ def do_end_of_term_queries(test, year, query, renamed):
 
     move_directory = "SAP Reports"
 
+    # For underscores - to be removed/commented when the SAP process is automated
+    dot_index = query.rfind(".")
+    right_index = query.rfind("_")
+    renamed = date + " " + query[:right_index] + " " + year[2:] + query[dot_index:]
+
     # FORMAT: return (query, renamed, archive_directory, UOSFA_folder)
     # query: The original file name
     # renamed: The name the file should have after being moved
@@ -20,6 +25,9 @@ def do_end_of_term_queries(test, year, query, renamed):
     # UOSFA_folder: The name of the folder the renamed file should be moved to
     # - (eg. "Budget Reports", "SAP Reports", "Unknown Reports") 
     # - put "None" if it shouldn't be moved to a folder in 'O:/UOSFA Reports/'
+
+    if query.startswith("UUFA_EOT_SAP_AGGCP_DLM"):
+        return (query, renamed, directory, move_directory)
 
     if query.startswith("UUFA_EOT_ACAD_PLAN_RVW_FRAP"):
         return (query, renamed, directory, move_directory)
