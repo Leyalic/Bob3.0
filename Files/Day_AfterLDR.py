@@ -23,6 +23,9 @@ def do_day_after_ldr(test, year, query, renamed):
     # - (eg. "Budget Reports", "SAP Reports", "Unknown Reports") 
     # - put "None" if it shouldn't be moved to a folder in 'O:/UOSFA Reports/'
 
+    if query.startswith("UUFA_PELL_TERM_AWARDS"):
+        return (query, renamed, directory, move_directory)
+
     if query.startswith("UUFA_LDR_MIN_ENROLLMENT_ATH"):
         return (query, renamed, directory, move_directory)
 
