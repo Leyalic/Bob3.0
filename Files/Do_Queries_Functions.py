@@ -63,9 +63,9 @@ date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})
 instance_regex = r"[_-][0-9_-]+\."
 
 # Directories
-#test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
 #test_UOSFA_directory = Path("O:/UOSFA Reports")
-test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+#test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
 
 UOSFA_directory = Path("O:/UOSFA Reports")
 
