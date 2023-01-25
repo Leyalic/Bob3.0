@@ -37,7 +37,8 @@ from Files import Tsm_Queries
 
 global test
 
-skip_files = [".zip", " DL ORIG ", " ALT Loan ORIG "]
+skip_files = [".zip", ".lnk", " DL ORIG ", " ALT Loan ORIG "]
+remove_files = ["FASTDVER", "FINAID_Checklist", "ussfa09", "USSFA090 Reset", "O-A", r"uosfa[0-9]+[a-zA-Z]*\.csv"]
 
 # The date becomes the current date and is then placed in MM-DD-YY format
 date = time.strftime("%x").replace("/", "-")
@@ -538,7 +539,8 @@ def move_files(filename, year):
     if info == "Empty": 
         info = Atb_Fbill_3C_Queries.do_atb_fb_3c_queries(test, filename, renamed)
 # Remove extra files 
-    if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
+    #if "FASTDVER" in filename or "FINAID_Checklist" in filename  or "ussfa09" in filename or "USSFA090 Reset" in filename or "O-A" in filename:
+    if any (re.search(regex_str, filename) for regex_str in remove_files):
         os.remove(folder_path / Path(filename))
         print("Removed " + filename)
         if is_odd_year(year):
