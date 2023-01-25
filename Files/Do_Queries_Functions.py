@@ -56,7 +56,7 @@ disbursement_date = datetime.datetime.min
 alt_loan_flag = False
 direct_loan_flag = False
 
-
+# Regular Expressions
 aid_year_regex = ["Aid[\s]?Y(ea)?r"]
 aid_num_regex = ["[0-9]{2,4}[\s]*$"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
@@ -75,7 +75,8 @@ test_alt_orig_folder = Path('C:/Testing Bob/ALT Loans/')
 dir_orig_folder = Path('O:/Systems/Direct Loans/Origination')
 alt_orig_folder = Path('O:/Systems/QUERIES/ALT Loans')
 
-query_dict = {} # Data format =  {"Query Name" : ("Archive Path", "UOSFA Folder")}
+# Automatically Updated Queries
+query_dict = {} # Data format =  {"Query Name" : "UOSFA Folder"}
 dict_path = "./Files/Query_Dictionary.csv"
 
 # Odd year
@@ -189,11 +190,17 @@ def search_excel_file(filename):
     fullpath = folder_path / filename
     workbook = openpyxl.load_workbook(fullpath, True)
     sheet = workbook.active
+    aid_cols = []
+    aid_rows = []
+    max_year = 0
     
+    # Locate cells containing the word 'Aid Year'
     for row in sheet.rows:
         for cell in row:
             value = str(cell.value)
             if is_aid_year_word(value):
+                aid_cols.append(cell.col_idx)
+                aid_rows.append(cell.row_idx)
                 if is_aid_year_num(value):
                     has = True
                     year = "20" +  str(value)[-2:]
@@ -205,18 +212,27 @@ def search_excel_file(filename):
                     workbook.close()
                     return (has, year)
 
-            lower_value = sheet.cell(cell.row_idx + 1, cell.col_idx)
-            if is_aid_year_word(lower_value):
-                if is_aid_year_num(lower_value):
-                    has = True
-                    year = "20" +  str(lower_value)[-2:]
-                    workbook.close()
-                    return (has, year)
-                elif is_date(lower_value):
-                    has = True
-                    year = "20" +  str(lower_value)[-2:] # Assumes date format w/ year at end
-                    workbook.close()
-                    return (has, year)
+    for i in range(len(aid_cols)):
+        aid_col = aid_cols[i]
+        aid_row = aid_rows[i]
+        curr_row = aid_row
+        while (curr_row < sheet.max_row):
+            value = sheet.cell(curr_row, aid_col)
+            if is_aid_year_word(value):
+                if is_aid_year_num(value):
+                    value_int = int(value[-2:])
+                    if value_int > max_year:
+                        max_year = value_int
+                        has = True
+                        year = "20" +  str(value)[-2:]                     
+                elif is_date(value):
+                    value_int = int(value[-2:])
+                    if value_int > max_year:
+                        max_year = value_int
+                        has = True
+                        year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
+                curr_row = curr_row + 1
+
     workbook.close()
     return (has, year)
 
@@ -351,6 +367,7 @@ def do_query_unknown(name, renamed, destination):
 def clean_filename(filename):
     if filename.endswith('.csv'):
         return filename
+
     hay_result = has_aid_year(filename)
     if hay_result[0]:
         dot_index = filename.find(".")
@@ -372,6 +389,7 @@ def clean_filename(filename):
             renamed = filename[:(instance_index)] + filename[dot_index:]
         else:
             renamed = filename[:(dot_index)] + filename[dot_index:]
+
     return renamed
 
 
@@ -716,7 +734,8 @@ def sort_files():
     if directory == "":
         return
     folder_path = directory
-    for filename in os.listdir(directory):
+    files = [filepath for filepath in os.listdir(directory) if os.path.isfile(Path(directory) / Path(filepath))]
+    for filename in files:
         pFilename = Path(filename)
         find_aid_year(pFilename)   
 
