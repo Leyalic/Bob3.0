@@ -1,6 +1,7 @@
 # Created by Joshua Hardy and mmason
 from genericpath import isfile
 import os
+from pickle import FALSE
 import re
 import xlrd
 import openpyxl
@@ -58,7 +59,7 @@ alt_loan_flag = False
 direct_loan_flag = False
 
 # Regular Expressions
-aid_year_regex = ["Aid[\s]?Y(ea)?r"]
+aid_year_regex = ["Aid[\s]?Y(ea)?r", "Year"]
 aid_num_regex = ["[0-9]{2,4}[\s]*$"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
 instance_regex = r"[_-][0-9_-]+\."
@@ -67,6 +68,7 @@ instance_regex = r"[_-][0-9_-]+\."
 test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
 #test_UOSFA_directory = Path("O:/UOSFA Reports")
 #test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+#test_UOSFA_directory = Path("O:\UOSFA Reports\Testing\Destination Folders")
 
 UOSFA_directory = Path("O:/UOSFA Reports")
 
@@ -118,6 +120,14 @@ def has_aid_year(filename):
     filestring = str(filename)
     has = False
     year = "0"
+
+    if ".csv" in filestring:
+        found_year = re.search("[-_][0-9]{4}\.", filestring)
+        if found_year:
+            has = True
+            year = "20" + found_year.group()[-3:-1]
+            return (has, year)
+
     found_year = re.search("_\d\d-", filestring)
     if found_year:
         has = True
@@ -140,6 +150,9 @@ def search_xls_file(filename):
     
     # Locate cells containing the word 'Aid Year'
     for row in range(sheet.nrows):
+        if row > 5:
+            #print(" Quit Early: " + str(filename))
+            break
         for col in range(sheet.ncols):
             value = sheet.cell_value(row, col)
             if is_aid_year_word(value):
@@ -335,16 +348,16 @@ def get_unknown_archive(UOSFA_folder):
 
 
 # Renames and moves file to manually selected folder
-def do_query_unknown(name, renamed, destination):
+def do_query_unknown(name, renamed, destination, add_query):
     global query_dict
     
-
     # Add query destination to query dictionary
-    load_dictionary()
-    if destination != "Unknown Reports":
-        cleaned = clean_filename(name)
-        query_dict[cleaned] = destination
-    save_dictionary()
+    if add_query:
+        load_dictionary()
+        if destination != "Unknown Reports":
+            cleaned = clean_filename(name)
+            query_dict[cleaned] = destination
+        save_dictionary()
     
     # Copy to archive and move to UOSFA folder
     current_filepath = str(folder_path / Path(name))
@@ -556,7 +569,7 @@ def move_files(filename, year):
         cleaned = clean_filename(filename)
         if cleaned in query_dict:
             val = query_dict[cleaned]
-            do_query_unknown(filename, renamed, val)
+            do_query_unknown(filename, renamed, val, False)
             return
 
 # Unknown File

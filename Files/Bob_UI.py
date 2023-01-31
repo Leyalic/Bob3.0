@@ -188,7 +188,7 @@ class BobWindow(tk.Frame):
 
             # Move file to selected folder
             renamed = Do_Queries_Functions.new_name(filename, aid_year)           
-            Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option)
+            Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option, True)
             unknown_list.remove(filename)
 
         #print("All Unknown Files Handled")
@@ -277,11 +277,13 @@ class BobWindow(tk.Frame):
     def reset_test_folder(self):
         #direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
         direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+        #direct = Path("O:\UOSFA Reports\Testing\Destination Folders")
 
         for folder in os.listdir(direct):
             path = direct / Path(folder)
             for old_file in os.listdir(path):
                 os.remove(path / Path(old_file))
+        print("Done Resetting")
 #############################################################################################
 
 
