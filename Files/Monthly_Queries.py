@@ -195,15 +195,24 @@ def do_monthlies(test, date, year, query, renamed):
         return (query, renamed, directory, move_directory)
 
     if "ussfa037" in query :
-        return (query, query, t_directory, award_directory)
+        return (query, date + " " + query, t_directory, award_directory)
 
     if "ussfa035-" in query :
-        return (query, query, t_directory, award_directory)
+        return (query, date + " " + query, t_directory, award_directory)
 
     if "MR_EXPIRED_MPN_CURR_LN" in query :
         return (query, renamed, directory, move_directory)
 
     if "_MR_RNDM_GRAD_ENR_CHANG" in query :
+        return (query, renamed, directory, move_directory)
+
+    if "UUFA_DL_COD_FYTD_AMOUNTS" in query :
+        return (query, renamed, directory, move_directory)
+
+    if "UUFA_SEFA_DL_TOTAL_STUDENT" in query :
+        return (query, renamed, directory, move_directory)
+
+    if "UUFA_EXPECTED_GRAD_DATE_ERROR" in query :
         return (query, renamed, directory, move_directory)
 
     return "Empty" #Leave as last line

@@ -299,6 +299,13 @@ def do_query(name, renamed, legacy_archive, UOSFA_folder):
     else:       
         UOSFA_destination = str(UOSFA_directory / UOSFA_folder)
 
+    # Make subfolders in UOSFA folder
+    #
+    #UOSFA_destination = str(Path(UOSFA_destination) / Path(aid_year?))
+    #
+    #if not os.path.isdir(UOSFA_destination):
+    #    os.makedirs(UOSFA_destination)
+
     if UOSFA_folder == "None":
         legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
         shutil.move(current_filepath, legacy_filepath)
