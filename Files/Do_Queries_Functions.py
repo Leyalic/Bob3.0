@@ -65,9 +65,9 @@ date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})
 instance_regex = r"[_-][0-9_-]+\."
 
 # Directories
-test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+#test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
 #test_UOSFA_directory = Path("O:/UOSFA Reports")
-#test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
 #test_UOSFA_directory = Path("O:\UOSFA Reports\Testing\Destination Folders")
 
 UOSFA_directory = Path("O:/UOSFA Reports")
@@ -133,6 +133,45 @@ def has_aid_year(filename):
         has = True
         year = "20" + found_year.group()[1:-1]
     return (has, year)
+
+
+# Finds the aid year of the file either in the file's name or contents
+def find_aid_year(filename):
+    global current_aid_year
+    global odd_aid_years
+    global even_aid_years
+
+    aid_year = current_aid_year # Default is current year
+    filestring = str(filename)  
+    file_year = has_aid_year(filestring) # file_year: (bool has_year, str year)
+
+    # Check in filename
+    if file_year[0]:
+        aid_year = file_year[1]
+
+    # Check in .xls cells
+    elif filestring.lower().endswith("xls"):
+        file_year = search_xls_file(filename)
+        if file_year[0]:
+            aid_year = file_year[1]           
+        else: 
+            aid_year = current_aid_year
+    
+    # Check in other spreadsheet cells
+    elif filestring.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
+        file_year = search_excel_file(filename) 
+        if file_year[0]:
+            aid_year = file_year[1]
+        else: 
+            aid_year = current_aid_year
+
+    # Record file name in appropriate list
+    if is_odd_year(aid_year):
+        odd_aid_years.append(filestring)
+    else:
+        even_aid_years.append(filestring)
+
+    return aid_year
 
 
 # Search for and return maximum aid year in xls file
@@ -359,12 +398,12 @@ def do_query_unknown(name, renamed, destination, add_query):
     global query_dict
     
     # Add query destination to query dictionary
-    if add_query:
-        load_dictionary()
+    if add_query:     
         if destination != "Unknown Reports":
+            load_dictionary()
             cleaned = clean_filename(name)
             query_dict[cleaned] = destination
-        save_dictionary()
+            save_dictionary()
     
     # Copy to archive and move to UOSFA folder
     current_filepath = str(folder_path / Path(name))
@@ -483,7 +522,7 @@ def new_name_disb(name, year):
     return renamed
 
 
-# Move files to corresponding directory
+# Checks query files to determine the arguments to do_query
 def move_files(filename, year):
     global current_aid_year
     global odd_aid_years
@@ -668,76 +707,8 @@ def move_alt_orig(filepath, dflt):
                 return False
     return True
 
-
-def aid_year_match(year):
-    global current_aid_year
-    if is_odd_year(current_aid_year):
-        return is_odd_year(year)
-    else:
-        return not is_odd_year(year)
-
-
-# Sort file into list depending on aid year
-def find_aid_year(filename):
-    global current_aid_year
-    global odd_aid_years
-    global even_aid_years
-
-    filestring = str(filename)
-    if any(word in filestring for word in skip_files):
-        return
-
-    file_year = has_aid_year(filestring)
-    if file_year[0]:
-        if is_odd_year(file_year[1]):
-            odd_aid_years.append(str(filestring))
-            move_files(filestring, file_year[1])
-        else:
-            even_aid_years.append(str(filestring))
-            move_files(filestring, file_year[1])
-    elif filestring.lower().endswith("xls"):
-        file_year = search_xls_file(filename)
-        if file_year[0]:
-            if is_odd_year(file_year[1]):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1])
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1])
-        else: # Default for spreadsheets is current year
-            if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year)
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year)
-    elif filestring.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
-        file_year = search_excel_file(filename) # file_year: (bool has_year, str year)
-        if file_year[0]:
-            if is_odd_year(file_year[1]):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1])
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1])
-        else: # Default for spreadsheets is current year
-            if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year)
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year)
-    else:
-        # Default is current year
-        if is_odd_year(current_aid_year):
-            odd_aid_years.append(str(filestring))
-            move_files(filestring, current_aid_year)
-        else:
-            even_aid_years.append(str(filestring))
-            move_files(filestring, current_aid_year)
-
     
-# Sort all files in directory into odd or even aid years
+# Sort all files in directory based on aid year, and send to corresponding folder
 def sort_files():
     global folder_path
     global test
@@ -755,11 +726,21 @@ def sort_files():
     root.destroy()
     if directory == "":
         return
+
+    # Skip nested folders
     folder_path = directory
     files = [filepath for filepath in os.listdir(directory) if os.path.isfile(Path(directory) / Path(filepath))]
-    for filename in files:
+    
+    for filename in files: 
+        # Skip certain files
+        if any(word in filename for word in skip_files):
+            continue
+
+        # Send file to corresponding folder
         pFilename = Path(filename)
-        find_aid_year(pFilename)   
+        aid_year = find_aid_year(pFilename)  
+        move_files(filename, aid_year)
+
 
 # Saves the Query Dictionary to a .csv file
 def save_dictionary():
@@ -800,7 +781,7 @@ def test_load():
     print("Test Load")
 
 
-# User Input - Initialize Aid year and disbursement date
+# Reset global variables and initialize with user input
 def initialize(year, is_test):
     global current_aid_year
     global STerm
