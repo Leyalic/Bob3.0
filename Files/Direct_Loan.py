@@ -4,7 +4,9 @@ import os
 def dl_pre_outbound(test, date, year, query, renamed):
 
     if test:
-        directory = os.path.realpath(os.path.join('C:\Testing Bob/Direct Loans', 'DL Pre-Outbound'))       
+        directory = os.path.realpath(os.path.join('C:\Testing Bob/Direct Loans', 'DL Pre-Outbound'))
+        heal_directory = os.path.realpath(os.path.join('C:\Testing Bob/Direct Loans', 'DL HEAL Flag'))
+        response_directory = os.path.realpath(os.path.join('C:\Testing Bob/Direct Loans', 'DL Response Files'))
     else:
         directory = os.path.realpath(os.path.join('O:/Systems/Direct Loans', 'DL Pre-Outbound'))
         heal_directory = os.path.realpath(os.path.join('O:/Systems/Direct Loans', 'DL HEAL Flag'))
@@ -12,14 +14,12 @@ def dl_pre_outbound(test, date, year, query, renamed):
        
     if not os.path.isdir(directory):
         os.makedirs(directory)
+    if not os.path.isdir(heal_directory):
+        os.makedirs(heal_directory)
+    if not os.path.isdir(response_directory):
+        os.makedirs(response_directory)
 
     move_directory = "Direct Loan Reports"
-
-    # For underscores - to be removed/commented when the DL process is automated
-    dot_index = query.rfind(".")
-    right_index = query.rfind("_")
-    aidyear_index = query.rfind("_", 0, right_index)
-    renamed = date + " " + query[:aidyear_index] + " " + year[2:] + query[dot_index:]
 
     # FORMAT: return (query, renamed, archive_directory, UOSFA_folder)
     # query: The original file name

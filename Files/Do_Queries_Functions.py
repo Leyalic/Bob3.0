@@ -327,9 +327,8 @@ def rename_no_duplicates(folder_path, renamed):
             filepath = filepath[:dot_index] + " (2)" + filepath[dot_index:]
     return filepath
 
-
 # Renames, copies, and moves file to desired destination
-def do_query(name, renamed, legacy_archive, UOSFA_folder):
+def do_query(name, renamed, legacy_archive, UOSFA_folder, year):
 
     current_filepath = str(folder_path / Path(name))
 
@@ -394,7 +393,7 @@ def get_unknown_archive(UOSFA_folder):
 
 
 # Renames and moves file to manually selected folder
-def do_query_unknown(name, renamed, destination, add_query):
+def do_query_unknown(name, renamed, destination, year, add_query):
     global query_dict
     
     # Add query destination to query dictionary
@@ -615,7 +614,7 @@ def move_files(filename, year):
         cleaned = clean_filename(filename)
         if cleaned in query_dict:
             val = query_dict[cleaned]
-            do_query_unknown(filename, renamed, val, False)
+            do_query_unknown(filename, renamed, val, year, False)
             return
 
 # Unknown File
@@ -624,7 +623,7 @@ def move_files(filename, year):
     elif info == "Removed":
         pass
     else:
-        do_query(info[0], info[1], info[2], info[3])
+        do_query(info[0], info[1], info[2], info[3], year)
 
 
 # Copy origination file for direct loans

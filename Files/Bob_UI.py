@@ -188,7 +188,7 @@ class BobWindow(tk.Frame):
 
             # Move file to selected folder
             renamed = Do_Queries_Functions.new_name(filename, aid_year)           
-            Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option, True)
+            Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option, aid_year, True)
             unknown_list.remove(filename)
 
         #print("All Unknown Files Handled")
