@@ -62,7 +62,7 @@ direct_loan_flag = False
 aid_year_regex = ["Aid[\s]?Y(ea)?r", "Year"]
 aid_num_regex = ["[0-9]{2,4}[\s]*$"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
-instance_regex = r"[_-][0-9_-]+\."
+instance_regex = [r"[_][0-9]{2}[_-][0-9]+\.", r"[_-][0-9]+\."]
 
 # Directories
 #test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
@@ -381,7 +381,7 @@ def get_unknown_archive(UOSFA_folder):
         archive = os.path.realpath(os.path.join('O:\Systems\QUERIES/SAP/', current_aid_year))
     elif UOSFA_folder == "Scholarship Reports":
         archive = os.path.realpath(os.path.join('O:\Systems\Scholarships', aid_year + ' Scholar\Queries'))
-    elif UOSFA_folder == "Unknown Reports":
+    elif UOSFA_folder == "Other Reports":
         return None
     elif UOSFA_folder == "Weekly Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Monday Weekly', aid_year, month_folder))
@@ -397,7 +397,7 @@ def do_query_unknown(name, renamed, destination, year, add_query):
     global query_dict
     
     # Add query destination to query dictionary
-    if add_query:     
+    if add_query:      
         if destination != "Unknown Reports":
             load_dictionary()
             cleaned = clean_filename(name)
@@ -435,22 +435,17 @@ def clean_filename(filename):
         return filename
 
     hay_result = has_aid_year(filename)
+    dot_index = filename.find(".")
+    res = get_regex_result(filename, instance_regex)
+    instance_index = -1
+    if res is not None:
+        instance_index = res.start()
     if hay_result[0]:
-        dot_index = filename.find(".")
-        res = re.search(instance_regex, filename)
-        instance_index = -1
-        if res is not None:
-            instance_index = res.start()
         if instance_index > -1:
             renamed = filename[:(instance_index)] + filename[dot_index:]
         else:
             renamed = filename[:(dot_index - 3)] + filename[dot_index:]
     else:
-        dot_index = filename.find(".")
-        res = re.search(instance_regex, filename)
-        instance_index = -1
-        if res is not None:
-            instance_index = res.start()
         if instance_index > -1:
             renamed = filename[:(instance_index)] + filename[dot_index:]
         else:
@@ -459,37 +454,29 @@ def clean_filename(filename):
     return renamed
 
 
+def get_regex_result(word, regex_list):
+    for i in range(len(regex_list)):
+        res = re.search(regex_list[i], word)
+        if res:
+            return res
+    return None
+
 # Returns renamed filename with current date and aid year included        
 def new_name(name, year):
     hay_result = has_aid_year(name)
     renamed = ""
-    if hay_result[0]:
-        dot_index = name.find(".")
-        #dash_index = name.rfind("-")
-        #if dash_index > -1:
-        #    renamed = date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
-        #else:
-        #    renamed = date + " " + name[:(dot_index - 3)] + " " + year[2:] + name[dot_index:]
-        res = re.search(instance_regex, name)
-        instance_index = -1
-        if res is not None:
-            instance_index = res.start()
+    dot_index = name.find(".")
+    res = get_regex_result(name, instance_regex)
+    instance_index = -1
+    if res is not None:
+        instance_index = res.start()
+
+    if hay_result[0]: 
         if instance_index > -1:
             renamed = date + " " + name[:(instance_index)] + " " + year[2:] + name[dot_index:]
         else:
             renamed = date + " " + name[:(dot_index - 3)] + " " + year[2:] + name[dot_index:]
-
     else:
-        dot_index = name.find(".")
-        #dash_index = name.rfind("-")
-        #if dash_index > -1:
-        #    renamed = date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
-        #else:
-        #    renamed = date + " " + name[:dot_index] + " " + year[2:] + name[dot_index:]
-        res = re.search(instance_regex, name)
-        instance_index = -1
-        if res is not None:
-            instance_index = res.start()
         if instance_index > -1:
             renamed = date + " " + name[:(instance_index)] + " " + year[2:] + name[dot_index:]
         else:
@@ -501,26 +488,18 @@ def new_name(name, year):
 def new_name_disb(name, year):
     hay_result = has_aid_year(name)
     renamed = ""
+    dot_index = name.find(".")
+    res = get_regex_result(name, instance_regex)
+    instance_index = -1
+    if res is not None:
+        instance_index = res.start()
+
     if hay_result[0]:
-        dot_index = name.find(".")
-        #dash_index = name.rfind("-")
-        #renamed = disbursement_date + " " + name[:(dash_index - 3)] + " " + year[2:] + name[dot_index:]
-        res = re.search(instance_regex, name)
-        instance_index = -1
-        if res is not None:
-            instance_index = res.start()
         if instance_index > -1:
             renamed = disbursement_date + " " + name[:(instance_index)] + " " + year[2:] + name[dot_index:]
         else:
             renamed = disbursement_date + " " + name[:(dot_index - 3)] + " " + year[2:] + name[dot_index:]
     else:
-        dot_index = name.find(".")
-        #dash_index = name.rfind("-")
-        #renamed = disbursement_date + " " + name[:dash_index] + " " + year[2:] + name[dot_index:]
-        res = re.search(instance_regex, name)
-        instance_index = -1
-        if res is not None:
-            instance_index = res.start()
         if instance_index > -1:
             renamed = disbursement_date + " " + name[:(instance_index)] + " " + year[2:] + name[dot_index:]
         else:
