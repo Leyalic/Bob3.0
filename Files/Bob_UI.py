@@ -147,11 +147,11 @@ class BobWindow(tk.Frame):
                     "External Award Reports",
                     "Financial Aid Reports",
                     "Monthly Reports",
+                    "Other Reports",
                     "Packaging Reports",
                     "Pell Reports",
                     "SAP Reports",
-                    "Scholarship Reports",
-                    "Unknown Reports",
+                    "Scholarship Reports",                    
                     "Weekly Reports"              
                   ]
         tk.Label(select_window, text=prompt, padx=10, pady=5).pack()
@@ -160,7 +160,7 @@ class BobWindow(tk.Frame):
         for i, option in enumerate(options):
             tk.Radiobutton(select_window, text=option, variable=v, value=i).pack(anchor="w")
         tk.Button(select_window, text="Submit", command=lambda: BobWindow.handle_selection(options[v.get()])).pack()
-        v.set(11)
+        v.set(7)
         select_window.title("Select Folder")
         return select_window
 
@@ -275,8 +275,8 @@ class BobWindow(tk.Frame):
     
 #############################################################################################
     def reset_test_folder(self):
-        #direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
-        direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+        direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
+        #direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
         #direct = Path("O:\UOSFA Reports\Testing\Destination Folders")
 
         for folder in os.listdir(direct):

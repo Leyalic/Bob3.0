@@ -20,6 +20,7 @@ def dl_pre_outbound(test, date, year, query, renamed):
         os.makedirs(response_directory)
 
     move_directory = "Direct Loan Reports"
+    other_directory = "Other Reports"
 
     # FORMAT: return (query, renamed, archive_directory, UOSFA_folder)
     # query: The original file name
@@ -80,5 +81,8 @@ def dl_pre_outbound(test, date, year, query, renamed):
 
     if query.startswith("UUFA_DLR_UG_PLUS_REFND_IND"):
         return (query, renamed, directory, move_directory)
+
+    if query.startswith("UUFA_ADJUST_LOAN_DATES"):
+        return (query, renamed, directory, other_directory)
                 
     return "Empty" #Leave as final line
