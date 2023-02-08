@@ -338,11 +338,11 @@ def do_query(name, renamed, legacy_archive, UOSFA_folder, year):
         UOSFA_destination = str(UOSFA_directory / UOSFA_folder)
 
     # Make subfolders in UOSFA folder
-    #
-    #UOSFA_destination = str(Path(UOSFA_destination) / Path(aid_year?))
-    #
-    #if not os.path.isdir(UOSFA_destination):
-    #    os.makedirs(UOSFA_destination)
+    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    datepath = Path(month) / Path(date) /Path(year)
+    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    if not os.path.isdir(UOSFA_destination):
+        os.makedirs(UOSFA_destination)
 
     if UOSFA_folder == "None":
         legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
@@ -417,6 +417,13 @@ def do_query_unknown(name, renamed, destination, year, add_query):
     if archive is not None:
         archive = rename_no_duplicates(archive, renamed)
         shutil.copy(current_filepath, archive)
+
+    # Make subfolders in UOSFA folder
+    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    datepath = Path(month) / Path(date) /Path(year)
+    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    if not os.path.isdir(UOSFA_destination):
+        os.makedirs(UOSFA_destination)
 
     destination_filepath = rename_no_duplicates(UOSFA_destination, renamed)
     shutil.move(current_filepath, destination_filepath)
