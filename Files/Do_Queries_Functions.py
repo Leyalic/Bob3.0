@@ -12,6 +12,8 @@ import tkinter
 from tkinter import filedialog
 from pathlib import Path
 import csv
+import warnings
+import io
 
 {}
 # Query imports
@@ -241,36 +243,50 @@ def search_excel_file(filename):
     year = "0"
 
     fullpath = folder_path / filename
-    workbook = openpyxl.load_workbook(fullpath, True)
+    workbook = None
+    with warnings.catch_warnings(record=True):
+        warnings.simplefilter("always")
+        with open(fullpath, "rb") as f:
+            in_mem_file = io.BytesIO(f.read())
+        workbook = openpyxl.load_workbook(in_mem_file, True)
     sheet = workbook.active
+    sheet.reset_dimensions()
     aid_cols = []
     aid_rows = []
     max_year = 0
-    
+
+    cur_row = 1
+    cur_col = 1
     # Locate cells containing the word 'Aid Year'
-    for row in sheet.rows:
-        for cell in row:
-            value = str(cell.value)
-            if is_aid_year_word(value):
-                aid_cols.append(cell.col_idx)
-                aid_rows.append(cell.row_idx)
-                if is_aid_year_num(value):
+    while cur_row < 6:
+        cur_col = 1
+        value = sheet.cell(cur_row, cur_col).value
+        while value is not None:
+            strval = str(value)
+            if is_aid_year_word(strval):
+                aid_cols.append(cur_col)
+                aid_rows.append(cur_row)
+                if is_aid_year_num(strval):
                     has = True
-                    year = "20" +  str(value)[-2:]
+                    year = "20" +  strval[-2:]
                     workbook.close()
                     return (has, year)
                 elif is_date(value):
                     has = True
-                    year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
+                    year = "20" +  strval[-2:] # Assumes date format w/ year at end
                     workbook.close()
                     return (has, year)
+            cur_col += 1
+            value = sheet.cell(cur_row, cur_col).value
+        cur_row += 1
 
+    # Search for Aid Year in columns titled 'Aid Year'
     for i in range(len(aid_cols)):
         aid_col = aid_cols[i]
         aid_row = aid_rows[i]
-        curr_row = aid_row
-        while (curr_row < sheet.max_row):
-            value = sheet.cell(curr_row, aid_col)
+        curr_row = aid_row       
+        while sheet.cell(curr_row, 1).value is not None:
+            value = sheet.cell(curr_row, aid_col).value
             if is_aid_year_word(value):
                 if is_aid_year_num(value):
                     value_int = int(value[-2:])
@@ -373,6 +389,8 @@ def get_unknown_archive(UOSFA_folder):
         archive = os.path.realpath('O:/Systems/QUERIES/')
     elif UOSFA_folder == "Monthly Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Monthly', month_folder))
+    elif UOSFA_folder == "Other Reports":
+        return None
     elif UOSFA_folder == "Packaging Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Packaging', aid_year, month_folder))
     elif UOSFA_folder == "Pell Reports":
@@ -381,7 +399,7 @@ def get_unknown_archive(UOSFA_folder):
         archive = os.path.realpath(os.path.join('O:\Systems\QUERIES/SAP/', current_aid_year))
     elif UOSFA_folder == "Scholarship Reports":
         archive = os.path.realpath(os.path.join('O:\Systems\Scholarships', aid_year + ' Scholar\Queries'))
-    elif UOSFA_folder == "Other Reports":
+    elif UOSFA_folder == "Unknown Reports":
         return None
     elif UOSFA_folder == "Weekly Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Monday Weekly', aid_year, month_folder))
