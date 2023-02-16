@@ -12,6 +12,8 @@ import tkinter
 from tkinter import filedialog
 from pathlib import Path
 import csv
+import warnings
+import io
 
 {}
 # Query imports
@@ -135,6 +137,45 @@ def has_aid_year(filename):
     return (has, year)
 
 
+# Finds the aid year of the file either in the file's name or contents
+def find_aid_year(filename):
+    global current_aid_year
+    global odd_aid_years
+    global even_aid_years
+
+    aid_year = current_aid_year # Default is current year
+    filestring = str(filename)  
+    file_year = has_aid_year(filestring) # file_year: (bool has_year, str year)
+
+    # Check in filename
+    if file_year[0]:
+        aid_year = file_year[1]
+
+    # Check in .xls cells
+    elif filestring.lower().endswith("xls"):
+        file_year = search_xls_file(filename)
+        if file_year[0]:
+            aid_year = file_year[1]           
+        else: 
+            aid_year = current_aid_year
+    
+    # Check in other spreadsheet cells
+    elif filestring.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
+        file_year = search_excel_file(filename) 
+        if file_year[0]:
+            aid_year = file_year[1]
+        else: 
+            aid_year = current_aid_year
+
+    # Record file name in appropriate list
+    if is_odd_year(aid_year):
+        odd_aid_years.append(filestring)
+    else:
+        even_aid_years.append(filestring)
+
+    return aid_year
+
+
 # Search for and return maximum aid year in xls file
 def search_xls_file(filename):
     global folder_path
@@ -202,36 +243,50 @@ def search_excel_file(filename):
     year = "0"
 
     fullpath = folder_path / filename
-    workbook = openpyxl.load_workbook(fullpath, True)
+    workbook = None
+    with warnings.catch_warnings(record=True):
+        warnings.simplefilter("always")
+        with open(fullpath, "rb") as f:
+            in_mem_file = io.BytesIO(f.read())
+        workbook = openpyxl.load_workbook(in_mem_file, True)
     sheet = workbook.active
+    sheet.reset_dimensions()
     aid_cols = []
     aid_rows = []
     max_year = 0
-    
+
+    cur_row = 1
+    cur_col = 1
     # Locate cells containing the word 'Aid Year'
-    for row in sheet.rows:
-        for cell in row:
-            value = str(cell.value)
-            if is_aid_year_word(value):
-                aid_cols.append(cell.col_idx)
-                aid_rows.append(cell.row_idx)
-                if is_aid_year_num(value):
+    while cur_row < 6:
+        cur_col = 1
+        value = sheet.cell(cur_row, cur_col).value
+        while value is not None:
+            strval = str(value)
+            if is_aid_year_word(strval):
+                aid_cols.append(cur_col)
+                aid_rows.append(cur_row)
+                if is_aid_year_num(strval):
                     has = True
-                    year = "20" +  str(value)[-2:]
+                    year = "20" +  strval[-2:]
                     workbook.close()
                     return (has, year)
                 elif is_date(value):
                     has = True
-                    year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
+                    year = "20" +  strval[-2:] # Assumes date format w/ year at end
                     workbook.close()
                     return (has, year)
+            cur_col += 1
+            value = sheet.cell(cur_row, cur_col).value
+        cur_row += 1
 
+    # Search for Aid Year in columns titled 'Aid Year'
     for i in range(len(aid_cols)):
         aid_col = aid_cols[i]
         aid_row = aid_rows[i]
-        curr_row = aid_row
-        while (curr_row < sheet.max_row):
-            value = sheet.cell(curr_row, aid_col)
+        curr_row = aid_row       
+        while sheet.cell(curr_row, 1).value is not None:
+            value = sheet.cell(curr_row, aid_col).value
             if is_aid_year_word(value):
                 if is_aid_year_num(value):
                     value_int = int(value[-2:])
@@ -288,9 +343,8 @@ def rename_no_duplicates(folder_path, renamed):
             filepath = filepath[:dot_index] + " (2)" + filepath[dot_index:]
     return filepath
 
-
 # Renames, copies, and moves file to desired destination
-def do_query(name, renamed, legacy_archive, UOSFA_folder):
+def do_query(name, renamed, legacy_archive, UOSFA_folder, year):
 
     current_filepath = str(folder_path / Path(name))
 
@@ -300,11 +354,11 @@ def do_query(name, renamed, legacy_archive, UOSFA_folder):
         UOSFA_destination = str(UOSFA_directory / UOSFA_folder)
 
     # Make subfolders in UOSFA folder
-    #
-    #UOSFA_destination = str(Path(UOSFA_destination) / Path(aid_year?))
-    #
-    #if not os.path.isdir(UOSFA_destination):
-    #    os.makedirs(UOSFA_destination)
+    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    datepath = Path(month) / Path(date) /Path(year)
+    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    if not os.path.isdir(UOSFA_destination):
+        os.makedirs(UOSFA_destination)
 
     if UOSFA_folder == "None":
         legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
@@ -335,6 +389,8 @@ def get_unknown_archive(UOSFA_folder):
         archive = os.path.realpath('O:/Systems/QUERIES/')
     elif UOSFA_folder == "Monthly Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Monthly', month_folder))
+    elif UOSFA_folder == "Other Reports":
+        return None
     elif UOSFA_folder == "Packaging Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Packaging', aid_year, month_folder))
     elif UOSFA_folder == "Pell Reports":
@@ -343,7 +399,7 @@ def get_unknown_archive(UOSFA_folder):
         archive = os.path.realpath(os.path.join('O:\Systems\QUERIES/SAP/', current_aid_year))
     elif UOSFA_folder == "Scholarship Reports":
         archive = os.path.realpath(os.path.join('O:\Systems\Scholarships', aid_year + ' Scholar\Queries'))
-    elif UOSFA_folder == "Other Reports":
+    elif UOSFA_folder == "Unknown Reports":
         return None
     elif UOSFA_folder == "Weekly Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Monday Weekly', aid_year, month_folder))
@@ -355,16 +411,16 @@ def get_unknown_archive(UOSFA_folder):
 
 
 # Renames and moves file to manually selected folder
-def do_query_unknown(name, renamed, destination, add_query):
+def do_query_unknown(name, renamed, destination, year, add_query):
     global query_dict
     
     # Add query destination to query dictionary
-    if add_query:
-        load_dictionary()
-        if destination != "Other Reports":
+    if add_query:      
+        if destination != "Unknown Reports":
+            load_dictionary()
             cleaned = clean_filename(name)
             query_dict[cleaned] = destination
-        save_dictionary()
+            save_dictionary()
     
     # Copy to archive and move to UOSFA folder
     current_filepath = str(folder_path / Path(name))
@@ -379,6 +435,13 @@ def do_query_unknown(name, renamed, destination, add_query):
     if archive is not None:
         archive = rename_no_duplicates(archive, renamed)
         shutil.copy(current_filepath, archive)
+
+    # Make subfolders in UOSFA folder
+    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    datepath = Path(month) / Path(date) /Path(year)
+    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    if not os.path.isdir(UOSFA_destination):
+        os.makedirs(UOSFA_destination)
 
     destination_filepath = rename_no_duplicates(UOSFA_destination, renamed)
     shutil.move(current_filepath, destination_filepath)
@@ -462,7 +525,7 @@ def new_name_disb(name, year):
     return renamed
 
 
-# Move files to corresponding directory
+# Checks query files to determine the arguments to do_query
 def move_files(filename, year):
     global current_aid_year
     global odd_aid_years
@@ -555,7 +618,7 @@ def move_files(filename, year):
         cleaned = clean_filename(filename)
         if cleaned in query_dict:
             val = query_dict[cleaned]
-            do_query_unknown(filename, renamed, val, False)
+            do_query_unknown(filename, renamed, val, year, False)
             return
 
 # Unknown File
@@ -564,7 +627,7 @@ def move_files(filename, year):
     elif info == "Removed":
         pass
     else:
-        do_query(info[0], info[1], info[2], info[3])
+        do_query(info[0], info[1], info[2], info[3], year)
 
 
 # Copy origination file for direct loans
@@ -647,76 +710,8 @@ def move_alt_orig(filepath, dflt):
                 return False
     return True
 
-
-def aid_year_match(year):
-    global current_aid_year
-    if is_odd_year(current_aid_year):
-        return is_odd_year(year)
-    else:
-        return not is_odd_year(year)
-
-
-# Sort file into list depending on aid year
-def find_aid_year(filename):
-    global current_aid_year
-    global odd_aid_years
-    global even_aid_years
-
-    filestring = str(filename)
-    if any(word in filestring for word in skip_files):
-        return
-
-    file_year = has_aid_year(filestring)
-    if file_year[0]:
-        if is_odd_year(file_year[1]):
-            odd_aid_years.append(str(filestring))
-            move_files(filestring, file_year[1])
-        else:
-            even_aid_years.append(str(filestring))
-            move_files(filestring, file_year[1])
-    elif filestring.lower().endswith("xls"):
-        file_year = search_xls_file(filename)
-        if file_year[0]:
-            if is_odd_year(file_year[1]):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1])
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1])
-        else: # Default for spreadsheets is current year
-            if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year)
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year)
-    elif filestring.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
-        file_year = search_excel_file(filename) # file_year: (bool has_year, str year)
-        if file_year[0]:
-            if is_odd_year(file_year[1]):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1])
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, file_year[1])
-        else: # Default for spreadsheets is current year
-            if is_odd_year(current_aid_year):
-                odd_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year)
-            else:
-                even_aid_years.append(str(filestring))
-                move_files(filestring, current_aid_year)
-    else:
-        # Default is current year
-        if is_odd_year(current_aid_year):
-            odd_aid_years.append(str(filestring))
-            move_files(filestring, current_aid_year)
-        else:
-            even_aid_years.append(str(filestring))
-            move_files(filestring, current_aid_year)
-
     
-# Sort all files in directory into odd or even aid years
+# Sort all files in directory based on aid year, and send to corresponding folder
 def sort_files():
     global folder_path
     global test
@@ -734,11 +729,21 @@ def sort_files():
     root.destroy()
     if directory == "":
         return
+
+    # Skip nested folders
     folder_path = directory
     files = [filepath for filepath in os.listdir(directory) if os.path.isfile(Path(directory) / Path(filepath))]
-    for filename in files:
+    
+    for filename in files: 
+        # Skip certain files
+        if any(word in filename for word in skip_files):
+            continue
+
+        # Send file to corresponding folder
         pFilename = Path(filename)
-        find_aid_year(pFilename)   
+        aid_year = find_aid_year(pFilename)  
+        move_files(filename, aid_year)
+
 
 # Saves the Query Dictionary to a .csv file
 def save_dictionary():
@@ -779,7 +784,7 @@ def test_load():
     print("Test Load")
 
 
-# User Input - Initialize Aid year and disbursement date
+# Reset global variables and initialize with user input
 def initialize(year, is_test):
     global current_aid_year
     global STerm

@@ -13,6 +13,7 @@ import time
 
 ###############################
 import os
+import shutil
 ###############################
 
 year_valid = False
@@ -151,7 +152,8 @@ class BobWindow(tk.Frame):
                     "Packaging Reports",
                     "Pell Reports",
                     "SAP Reports",
-                    "Scholarship Reports",                    
+                    "Scholarship Reports",
+                    "Unknown Reports",
                     "Weekly Reports"              
                   ]
         tk.Label(select_window, text=prompt, padx=10, pady=5).pack()
@@ -160,7 +162,7 @@ class BobWindow(tk.Frame):
         for i, option in enumerate(options):
             tk.Radiobutton(select_window, text=option, variable=v, value=i).pack(anchor="w")
         tk.Button(select_window, text="Submit", command=lambda: BobWindow.handle_selection(options[v.get()])).pack()
-        v.set(7)
+        v.set(12)
         select_window.title("Select Folder")
         return select_window
 
@@ -187,8 +189,9 @@ class BobWindow(tk.Frame):
             #("Moved to " + folder_option)
 
             # Move file to selected folder
+            #year = Do_Queries_Functions.find_aid_year(Path(filename))
             renamed = Do_Queries_Functions.new_name(filename, aid_year)           
-            Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option, True)
+            Do_Queries_Functions.do_query_unknown(filename, renamed, folder_option, aid_year, True)
             unknown_list.remove(filename)
 
         #print("All Unknown Files Handled")
@@ -282,7 +285,8 @@ class BobWindow(tk.Frame):
         for folder in os.listdir(direct):
             path = direct / Path(folder)
             for old_file in os.listdir(path):
-                os.remove(path / Path(old_file))
+                #os.remove(path / Path(old_file))
+                shutil.rmtree(path / Path(old_file))
         print("Done Resetting")
 #############################################################################################
 
