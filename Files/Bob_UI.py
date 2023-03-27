@@ -285,8 +285,8 @@ class BobWindow(tk.Frame):
         for folder in os.listdir(direct):
             path = direct / Path(folder)
             for old_file in os.listdir(path):
-                #os.remove(path / Path(old_file))
-                shutil.rmtree(path / Path(old_file))
+                os.remove(path / Path(old_file))
+                #shutil.rmtree(path / Path(old_file))
         print("Done Resetting")
 #############################################################################################
 

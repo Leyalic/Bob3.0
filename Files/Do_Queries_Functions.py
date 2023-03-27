@@ -155,7 +155,7 @@ def find_aid_year(filename):
     elif filestring.lower().endswith("xls"):
         file_year = search_xls_file(filename)
         if file_year[0]:
-            aid_year = file_year[1]           
+            aid_year = file_year[1]
         else: 
             aid_year = current_aid_year
     
@@ -353,12 +353,12 @@ def do_query(name, renamed, legacy_archive, UOSFA_folder, year):
     else:       
         UOSFA_destination = str(UOSFA_directory / UOSFA_folder)
 
-    # Make subfolders in UOSFA folder
-    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
-    datepath = Path(month) / Path(date) /Path(year)
-    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
-    if not os.path.isdir(UOSFA_destination):
-        os.makedirs(UOSFA_destination)
+    ## Make subfolders in UOSFA folder
+    #month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    #datepath = Path(month) / Path(date) /Path(year)
+    #UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    #if not os.path.isdir(UOSFA_destination):
+    #    os.makedirs(UOSFA_destination)
 
     if UOSFA_folder == "None":
         legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
@@ -436,12 +436,12 @@ def do_query_unknown(name, renamed, destination, year, add_query):
         archive = rename_no_duplicates(archive, renamed)
         shutil.copy(current_filepath, archive)
 
-    # Make subfolders in UOSFA folder
-    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
-    datepath = Path(month) / Path(date) /Path(year)
-    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
-    if not os.path.isdir(UOSFA_destination):
-        os.makedirs(UOSFA_destination)
+    ## Make subfolders in UOSFA folder
+    #month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    #datepath = Path(month) / Path(date) /Path(year)
+    #UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    #if not os.path.isdir(UOSFA_destination):
+    #    os.makedirs(UOSFA_destination)
 
     destination_filepath = rename_no_duplicates(UOSFA_destination, renamed)
     shutil.move(current_filepath, destination_filepath)
@@ -559,7 +559,7 @@ def move_files(filename, year):
         info = Monthly_Queries.do_monthlies(test, date, current_aid_year, filename, renamed)
 # Disbursement Queries
     if info == "Empty": 
-        info = Disbursement_Queries.do_disb_queries(test, date, year, filename, renamed_disb)
+        info = Disbursement_Queries.do_disb_queries(test, date, year, filename, renamed, renamed_disb)
 #2nd LDR Queries
     if info == "Empty": 
         info = Second_LDR.do_2nd_ldr(test, year, filename, renamed)
