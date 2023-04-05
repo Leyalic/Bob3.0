@@ -63,6 +63,8 @@ direct_loan_flag = False
 # Regular Expressions
 aid_year_regex = ["Aid[\s]?Y(ea)?r", "Year"]
 aid_num_regex = ["[0-9]{2,4}[\s]*$"]
+term_regex = ["Term"]
+term_num_regex = ["1[0-9][0-9][468]"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
 instance_regex = [r"[_][0-9]{2}[_-][0-9]+\.", r"[_-][0-9]+\."]
 
@@ -92,6 +94,9 @@ def is_odd_year(year):
 def is_aid_year_word(value):
     return any (re.search(regex_str, str(value), re.IGNORECASE) for regex_str in aid_year_regex)
 
+def is_term_word(value):
+    return any (re.search(regex_str, str(value), re.IGNORECASE) for regex_str in term_regex)
+
 def is_aid_year_num(value):
     # Find 2 to 4 digit number
     result = re.search(aid_num_regex[0], str(value))
@@ -111,6 +116,21 @@ def is_aid_year_num(value):
             return (match_num > curr_num - 5) and (match_num < curr_num + 5)
 
     return result
+
+def parse_term_num(value):
+    # Find term formatted number
+    result = re.search(term_num_regex[0], str(value))
+    
+    # Check if number is within aid year range
+    if result:
+        match = result.group(0)
+        match_num = int(match[1:3])
+        curr_num = int(current_aid_year)
+        match_num += 2000
+        if (match_num > curr_num - 5) and (match_num < curr_num + 5):
+            return match_num
+
+    return -1
 
 
 def is_date(value):
@@ -209,6 +229,17 @@ def search_xls_file(filename):
                     year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
                     workbook.release_resources()
                     return (has, year)
+
+            # Sometimes there's a "Term" value instead of an "Aid Year"
+            elif is_term_word(value):
+                term_year = parse_term_num(value)
+                if term_year != -1:
+                    has = True
+                    year = str(term_year)
+                    workbook.release_resources()
+                    print("Used Term instead of Aid Year: " + str(filename))
+                    return (has, year)
+
     
     # Find maximum aid year in 'Aid Year' column
     for i in range(len(aid_cols)):
@@ -276,6 +307,17 @@ def search_excel_file(filename):
                     year = "20" +  strval[-2:] # Assumes date format w/ year at end
                     workbook.close()
                     return (has, year)
+
+            # Sometimes there's a "Term" value instead of an "Aid Year"
+            elif is_term_word(strval):
+                term_year = parse_term_num(strval)
+                if term_year != -1:
+                    has = True
+                    year = str(term_year)
+                    workbook.close()  
+                    print("Used Term instead of Aid Year: " + str(filename))
+                    return (has, year)
+
             cur_col += 1
             value = sheet.cell(cur_row, cur_col).value
         cur_row += 1
