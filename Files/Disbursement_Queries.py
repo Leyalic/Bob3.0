@@ -113,16 +113,16 @@ def do_disb_queries(test, date, year, query, renamed, renamed_disb):
         return (query, renamed, pell_directory, move_pell_directory)
 
     if "UUFA_PELL_RSP_COD_EDITS" in query :
-        return (query, renamed_disb, pell_directory, move_pell_directory)
+        return (query, renamed, pell_directory, move_pell_directory)
 
     if "UUFA_PELL_RSP_COD_IN" in query :
-        return (query, renamed_disb, pell_directory, move_pell_directory)
+        return (query, renamed, pell_directory, move_pell_directory)
 
     if "UUFA_PELL_RSP_DISB_ACTION_CODE" in query :
-        return (query, renamed_disb, pell_directory, move_pell_directory)
+        return (query, renamed, pell_directory, move_pell_directory)
 
     if "UUFA_PELL_RSP_ORIG_AWARD" in query :
-        return (query, renamed_disb, pell_directory, move_pell_directory)
+        return (query, renamed, pell_directory, move_pell_directory)
 
     return "Empty" #Leave as last line
 
