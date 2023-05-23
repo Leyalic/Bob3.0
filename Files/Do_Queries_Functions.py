@@ -70,9 +70,8 @@ instance_regex = [r"[_][0-9]{2}[_-][0-9]+\.", r"[_-][0-9]+\."]
 
 # Directories
 test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
-#test_UOSFA_directory = Path("O:/UOSFA Reports")
 #test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
-#test_UOSFA_directory = Path("O:\UOSFA Reports\Testing\Destination Folders")
+#test_UOSFA_directory = Path("O:/UOSFA Reports/Testing/Destination Folders")
 
 UOSFA_directory = Path("O:/UOSFA Reports")
 
@@ -395,12 +394,12 @@ def do_query(name, renamed, legacy_archive, UOSFA_folder, year):
     else:       
         UOSFA_destination = str(UOSFA_directory / UOSFA_folder)
 
-    ## Make subfolders in UOSFA folder
-    #month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
-    #datepath = Path(month) / Path(date) /Path(year)
-    #UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
-    #if not os.path.isdir(UOSFA_destination):
-    #    os.makedirs(UOSFA_destination)
+    # Make subfolders in UOSFA folder
+    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    datepath = Path(month) / Path(date) /Path(year)
+    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    if not os.path.isdir(UOSFA_destination):
+        os.makedirs(UOSFA_destination)
 
     if UOSFA_folder == "None":
         legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
@@ -478,12 +477,12 @@ def do_query_unknown(name, renamed, destination, year, add_query):
         archive = rename_no_duplicates(archive, renamed)
         shutil.copy(current_filepath, archive)
 
-    ## Make subfolders in UOSFA folder
-    #month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
-    #datepath = Path(month) / Path(date) /Path(year)
-    #UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
-    #if not os.path.isdir(UOSFA_destination):
-    #    os.makedirs(UOSFA_destination)
+    # Make subfolders in UOSFA folder
+    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    datepath = Path(month) / Path(date) /Path(year)
+    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    if not os.path.isdir(UOSFA_destination):
+        os.makedirs(UOSFA_destination)
 
     destination_filepath = rename_no_duplicates(UOSFA_destination, renamed)
     shutil.move(current_filepath, destination_filepath)
