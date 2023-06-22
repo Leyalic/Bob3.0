@@ -7,11 +7,17 @@ def do_daily_scholarships(test, year, query, renamed):
 
     if test:
         directory = os.path.realpath(os.path.join('C:\Testing Bob', aid_year + ' Scholar\Queries'))
+        directory_save = os.path.realpath(os.path.join('C:\Testing Bob/Save', aid_year))
     else:
         directory = os.path.realpath(os.path.join('O:\Systems', aid_year + ' Scholar\Queries'))
+        directory_save = os.path.realpath(os.path.join('O:\Systems\Queries\Save', aid_year))
 
+    # the list 'my_path' should be populated with the FOLDER variables above.
     if not os.path.isdir(directory):
         os.makedirs(directory)
+
+    if not os.path.isdir(directory_save):
+        os.makedirs(directory_save)
 
     move_directory = "Scholarship Reports"
 
@@ -31,7 +37,22 @@ def do_daily_scholarships(test, year, query, renamed):
 
     if query.startswith("UUFA_SCHOLAR_AUTH_NOT_DISB") :
         return (query, renamed, directory, move_directory)
+    
+    if ("BOOKS_NOPOST" in query) :
+        return (query, renamed, directory_save, move_directory)
 
+    if ("MISC_NOPOST" in query) :
+        return (query, renamed, directory_save, move_directory)
+
+    if ("ROOMBOARD_NOPOST" in query) :
+        return (query, renamed, directory_save, move_directory)
+
+    if ("TRAINEESHIP_NOPOST" in query) :
+        return (query, renamed, directory_save, move_directory)
+
+    if ("TRAVEL_NOPOST" in query) :
+        return (query, renamed, directory_save, move_directory)
+    
     return "Empty" #Leave as last line
  
 
@@ -77,31 +98,16 @@ def do_weekly_scholarships(test, year, query, renamed):
     if ("CARES_HEERF" in query):
         return (query, renamed, directory, move_directory)
 
-    if ("MISC_NOPOST" in query) :
-        return (query, renamed, directory_save, move_directory)
-
     if ("BOOKS_TOTAL" in query) :
-        return (query, renamed, directory_save, move_directory)
-
-    if ("BOOKS_NOPOST" in query) :
         return (query, renamed, directory_save, move_directory)
 
     if ("ROOMBOARD_TOTAL" in query) :
         return (query, renamed, directory_save, move_directory)
 
-    if ("ROOMBOARD_NOPOST" in query) :
-        return (query, renamed, directory_save, move_directory)
-
     if ("TRAVEL_TOTAL" in query) :
         return (query, renamed, directory_save, move_directory)
 
-    if ("TRAVEL_NOPOST" in query) :
-        return (query, renamed, directory_save, move_directory)
-
     if (("TRAINEESHIP" in query) and ("TOTAL" in query)) :
-        return (query, renamed, directory_save, move_directory)
-
-    if ("TRAINEESHIP_NOPOST" in query) :
         return (query, renamed, directory_save, move_directory)
 
     #if( year == int(date[-2:])+1):
