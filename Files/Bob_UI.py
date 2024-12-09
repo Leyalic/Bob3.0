@@ -279,14 +279,13 @@ class BobWindow(tk.Frame):
 #############################################################################################
     def reset_test_folder(self):
         #direct = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
-        direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
-        #direct = Path("O:\UOSFA Reports\Testing\Destination Folders")
+        #direct = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+        direct = Path("O:/UOSFA Reports/Testing/Destination Folders")
 
         for folder in os.listdir(direct):
             path = direct / Path(folder)
             for old_file in os.listdir(path):
                 os.remove(path / Path(old_file))
-                #shutil.rmtree(path / Path(old_file))
         print("Done Resetting")
 #############################################################################################
 

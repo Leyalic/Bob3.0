@@ -6,12 +6,12 @@ def do_daily_scholarships(test, year, query, renamed):
     aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
-        directory = os.path.realpath(os.path.join('C:\Testing Bob', aid_year + ' Scholar\Queries'))
-        directory_save = os.path.realpath(os.path.join('C:\Testing Bob/Save', aid_year))
+        directory = os.path.realpath(os.path.join('C:/Testing Bob', aid_year + ' Scholar/Queries'))
+        directory_save = os.path.realpath(os.path.join('C:/Testing Bob/Save', aid_year))
     else:
-        directory = os.path.realpath(os.path.join('O:\Systems', aid_year + ' Scholar\Queries'))
-        directory_save = os.path.realpath(os.path.join('O:\Systems\Queries\Save', aid_year))
-
+        directory = os.path.realpath(os.path.join('O:/Systems', aid_year + ' Scholar/Queries'))
+        directory_save = os.path.realpath(os.path.join('O:/Systems/Queries/Save', aid_year))
+    
     # the list 'my_path' should be populated with the FOLDER variables above.
     if not os.path.isdir(directory):
         os.makedirs(directory)
@@ -40,19 +40,22 @@ def do_daily_scholarships(test, year, query, renamed):
     
     if ("BOOKS_NOPOST" in query) :
         return (query, renamed, directory_save, move_directory)
-
+    
     if ("MISC_NOPOST" in query) :
         return (query, renamed, directory_save, move_directory)
-
+    
     if ("ROOMBOARD_NOPOST" in query) :
         return (query, renamed, directory_save, move_directory)
-
+    
     if ("TRAINEESHIP_NOPOST" in query) :
         return (query, renamed, directory_save, move_directory)
-
+    
     if ("TRAVEL_NOPOST" in query) :
         return (query, renamed, directory_save, move_directory)
     
+    if ("IL_FELLOWSHIP_SCH_NP" in query):
+         return (query, renamed, directory, move_directory)
+
     return "Empty" #Leave as last line
  
 
@@ -62,13 +65,13 @@ def do_weekly_scholarships(test, year, query, renamed):
     aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
-        directory = os.path.realpath(os.path.join('C:\Testing Bob/Scholarships', aid_year + ' Scholar\Queries'))
-        directory_save = os.path.realpath(os.path.join('C:\Testing Bob/Save', aid_year))
-        directory_errors = os.path.realpath('C:\Systems\External Awards\Errors')
+        directory = os.path.realpath(os.path.join('C:/Testing Bob/Scholarships', aid_year + ' Scholar/Queries'))
+        directory_save = os.path.realpath(os.path.join('C:/Testing Bob/Save', aid_year))
+        directory_errors = os.path.realpath('C:/Systems/External Awards/Errors')
     else:
-        directory = os.path.realpath(os.path.join('O:\Systems\Scholarships', aid_year + ' Scholar\Queries'))
-        directory_save = os.path.realpath(os.path.join('O:\Systems\Queries\Save', aid_year))
-        directory_errors = os.path.realpath('O:\Systems\External Awards\Errors')
+        directory = os.path.realpath(os.path.join('O:/Systems/Scholarships', aid_year + ' Scholar/Queries'))
+        directory_save = os.path.realpath(os.path.join('O:/Systems/Queries/Save', aid_year))
+        directory_errors = os.path.realpath('O:/Systems/External Awards/Errors')
 
     # the list 'my_path' should be populated with the FOLDER variables above.
     if not os.path.isdir(directory):
@@ -110,7 +113,6 @@ def do_weekly_scholarships(test, year, query, renamed):
     if (("TRAINEESHIP" in query) and ("TOTAL" in query)) :
         return (query, renamed, directory_save, move_directory)
 
-    #if( year == int(date[-2:])+1):
     if ("SCH_ALL_NEED" in query):
         return (query, renamed, directory, move_directory)
 
@@ -127,18 +129,24 @@ def do_weekly_scholarships(test, year, query, renamed):
         return (query, renamed, directory, move_directory)
 
     if ("WS_UT_PROMISE_CHKLST" in query):
-            return (query, renamed, directory, move_directory)
+        return (query, renamed, directory, move_directory)
 
     if ("WS_SCH_ALL_EA_ERRORS" in query):
-            return (query, renamed, directory_errors, external_directory)
+        return (query, renamed, directory_errors, external_directory)
 
     if ("WS_SCHOLAR_ADM_REVIEW" in query):
-            return (query, renamed, directory, move_directory)
+        return (query, renamed, directory, move_directory)
 
     if ("WS_FAC_STAFF" in query):
-            return (query, renamed, directory, move_directory)
+        return (query, renamed, directory, move_directory)
 
     if ("WS_SCHOLAR_STATUS" in query):
-            return (query, renamed, directory, move_directory)
+        return (query, renamed, directory, move_directory)
+    
+    if ("UUFA_WR_SCH_PLACEHOLDER" in query):
+         return (query, renamed, directory, move_directory)
+    
+    if ("UUFA_IL_FELLOWSHIP_SCH_NOPOST" in query):
+         return (query, renamed, directory, move_directory)
 
     return "Empty" #Leave as last line

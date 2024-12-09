@@ -1,9 +1,9 @@
-# Created by Joshua Hardy and mmason
+# Created by Joshua Hardy, mmason, and Iman
 from genericpath import isfile
 import os
 from pickle import FALSE
 import re
-import xlrd
+#import xlrd
 import openpyxl
 import datetime
 import time
@@ -66,12 +66,12 @@ aid_num_regex = ["[0-9]{2,4}[\s]*$"]
 term_regex = ["Term"]
 term_num_regex = ["1[0-9][0-9][468]"]
 date_regex = ["(0*[1-9]|1[012])[-/.](0*[1-9]|[12][0-9]|3[01])[-/.](2\d{3}|\d{2})","(0*[1-9]|[12][0-9]|3[01])[-/.](0*[1-9]|1[012])[-/.](2\d{3}|\d{2})"]
-instance_regex = [r"[_][0-9]{2}[_-][0-9]+\.", r"[_-][0-9]+\."]
+instance_regex = ["[_][0-9]{2}[_-][0-9]+\.", "[_-][0-9]+\."]
 
 # Directories
-test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
+#test_UOSFA_directory = Path("C:/Users/iessaghir/Documents/DoQueries/Destination Folders")
 #test_UOSFA_directory = Path("C:/Users/JHARDY/Documents/DoQueries/Destination Folders")
-#test_UOSFA_directory = Path("O:/UOSFA Reports/Testing/Destination Folders")
+test_UOSFA_directory = Path("O:/UOSFA Reports/Testing/Destination Folders")
 
 UOSFA_directory = Path("O:/UOSFA Reports")
 
@@ -143,13 +143,13 @@ def has_aid_year(filename):
     year = "0"
 
     if ".csv" in filestring:
-        found_year = re.search("[-_][0-9]{4}\.", filestring)
+        found_year = re.search(r"[-_][0-9]{4}\.", filestring)
         if found_year:
             has = True
             year = "20" + found_year.group()[-3:-1]
             return (has, year)
 
-    found_year = re.search("_\d\d-", filestring)
+    found_year = re.search(r"_\d\d-", filestring)
     if found_year:
         has = True
         year = "20" + found_year.group()[1:-1]
@@ -170,13 +170,13 @@ def find_aid_year(filename):
     if file_year[0]:
         aid_year = file_year[1]
 
-    # Check in .xls cells
-    elif filestring.lower().endswith("xls"):
-        file_year = search_xls_file(filename)
-        if file_year[0]:
-            aid_year = file_year[1]
-        else: 
-            aid_year = current_aid_year
+    # Check in .xls cells - Retired as of Aug 2, 2024, xlrd no longer supported
+    #elif filestring.lower().endswith("xls"):
+       # file_year = search_xls_file(filename)
+       # if file_year[0]:
+      #      aid_year = file_year[1]
+      #  else: 
+      #      aid_year = current_aid_year
     
     # Check in other spreadsheet cells
     elif filestring.lower().endswith(('xlsx', 'xlsm', 'xltx', 'xltm')):
@@ -196,74 +196,75 @@ def find_aid_year(filename):
 
 
 # Search for and return maximum aid year in xls file
-def search_xls_file(filename):
-    global folder_path
-    has = False
-    year = "0"
+# Changes as of Aug 2, 2024 :  Commenting the xlrd related search query as the format is no longer supported
+#def search_xls_file(filename):
+ #   global folder_path
+  #  has = False
+   # year = "0"
 
-    fullpath = folder_path / filename
-    workbook = xlrd.open_workbook(fullpath, logfile=open(os.devnull, 'w'))
-    sheet = workbook.sheet_by_index(0)
-    aid_cols = []
-    aid_rows = []
-    max_year = 0
+    #fullpath = folder_path / filename
+    #workbook = xlrd.open_workbook(fullpath, logfile=open(os.devnull, 'w'))
+    #sheet = workbook.sheet_by_index(0)
+    #aid_cols = []
+    #aid_rows = []
+    #max_year = 0
     
     # Locate cells containing the word 'Aid Year'
-    for row in range(sheet.nrows):
-        if row > 5:
+    #for row in range(sheet.nrows):
+     #   if row > 5:
             #print(" Quit Early: " + str(filename))
-            break
-        for col in range(sheet.ncols):
-            value = sheet.cell_value(row, col)
-            if is_aid_year_word(value):
-                aid_cols.append(col)
-                aid_rows.append(row)
-                if is_aid_year_num(value):
-                    has = True
-                    year = "20" +  str(value)[-2:] 
-                    workbook.release_resources()
-                    return (has, year)
-                elif is_date(value):
-                    has = True
-                    year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
-                    workbook.release_resources()
-                    return (has, year)
+      #      break
+       # for col in range(sheet.ncols):
+        #    value = sheet.cell_value(row, col)
+         #   if is_aid_year_word(value):
+          #      aid_cols.append(col)
+           #     aid_rows.append(row)
+            #    if is_aid_year_num(value):
+             #       has = True
+              #      year = "20" +  str(value)[-2:] 
+               #     workbook.release_resources()
+                #    return (has, year)
+                #elif is_date(value):
+                 #   has = True
+                  #  year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
+                   # workbook.release_resources()
+                    #return (has, year)
 
             # Sometimes there's a "Term" value instead of an "Aid Year"
-            elif is_term_word(value):
-                term_year = parse_term_num(value)
-                if term_year != -1:
-                    has = True
-                    year = str(term_year)
-                    workbook.release_resources()
-                    print("Used Term instead of Aid Year: " + str(filename))
-                    return (has, year)
+            #elif is_term_word(value):
+             #   term_year = parse_term_num(value)
+              #  if term_year != -1:
+               #     has = True
+                #    year = str(term_year)
+                 #   workbook.release_resources()
+                  #  print("Used Term instead of Aid Year: " + str(filename))
+                   # return (has, year)
 
     
     # Find maximum aid year in 'Aid Year' column
-    for i in range(len(aid_cols)):
-        aid_col = aid_cols[i]
-        aid_row = aid_rows[i]
-        if aid_col > -1:
-            curr_row = aid_row
-            while (curr_row < sheet.nrows):
-                value = str(sheet.cell_value(curr_row, aid_col))
-                if is_aid_year_num(value):
-                    value_int = int(value[-2:])
-                    if value_int > max_year:
-                        max_year = value_int
-                        has = True
-                        year = "20" +  str(value)[-2:]
-                elif is_date(value):
-                    value_int = int(value[-2:])
-                    if value_int > max_year:
-                        max_year = value_int
-                        has = True
-                        year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
-                curr_row = curr_row + 1
+   # for i in range(len(aid_cols)):
+    #    aid_col = aid_cols[i]
+     #   aid_row = aid_rows[i]
+      #  if aid_col > -1:
+       #     curr_row = aid_row
+        #    while (curr_row < sheet.nrows):
+         #       value = str(sheet.cell_value(curr_row, aid_col))
+          #      if is_aid_year_num(value):
+           #         value_int = int(value[-2:])
+            #        if value_int > max_year:
+             #           max_year = value_int
+              #          has = True
+               #         year = "20" +  str(value)[-2:]
+                #elif is_date(value):
+                 #   value_int = int(value[-2:])
+                  #  if value_int > max_year:
+                   #     max_year = value_int
+                    #    has = True
+                     #   year = "20" +  str(value)[-2:] # Assumes date format w/ year at end
+                #curr_row = curr_row + 1
 
-    workbook.release_resources()
-    return (has, year)
+    #workbook.release_resources()
+    # return (has, year)
 
 
 # Search for and return aid year in excel file
@@ -395,15 +396,15 @@ def do_query(name, renamed, legacy_archive, UOSFA_folder, year):
         UOSFA_destination = str(UOSFA_directory / UOSFA_folder)
 
     # Make subfolders in UOSFA folder
-    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
-    datepath = Path(month) / Path(date) /Path(year)
-    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
-    if not os.path.isdir(UOSFA_destination):
-        os.makedirs(UOSFA_destination)
+    #month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    #datepath = Path(month) / Path(date) /Path(year)
+    #UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    #if not os.path.isdir(UOSFA_destination):
+    #    os.makedirs(UOSFA_destination)
 
     if UOSFA_folder == "None":
-        legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
-        shutil.move(current_filepath, legacy_filepath)
+       legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
+       shutil.move(current_filepath, legacy_filepath)
     else:
         legacy_filepath = rename_no_duplicates(legacy_archive, renamed)
         UOSFA_filepath = rename_no_duplicates(UOSFA_destination, renamed)
@@ -425,7 +426,7 @@ def get_unknown_archive(UOSFA_folder):
     elif UOSFA_folder == "Direct Loan Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/Direct Loans', 'DL Pre-Outbound'))
     elif UOSFA_folder == "External Award Reports":
-        archive = os.path.realpath("O:\Systems\External Awards\External Award Queries")
+        archive = os.path.realpath(os.path("O:/Systems/External Awards/External Award Queries"))
     elif UOSFA_folder == "Financial Aid Reports":
         archive = os.path.realpath('O:/Systems/QUERIES/')
     elif UOSFA_folder == "Monthly Reports":
@@ -435,11 +436,11 @@ def get_unknown_archive(UOSFA_folder):
     elif UOSFA_folder == "Packaging Reports":
         archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Packaging', aid_year, month_folder))
     elif UOSFA_folder == "Pell Reports":
-        archive = os.path.realpath(os.path.join('O:\Systems\QUERIES\Pell Repackaging', aid_year))
+        archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/Pell Repackaging', aid_year))
     elif UOSFA_folder == "SAP Reports":
-        archive = os.path.realpath(os.path.join('O:\Systems\QUERIES/SAP/', current_aid_year))
+        archive = os.path.realpath(os.path.join('O:/Systems/QUERIES/SAP/', current_aid_year))
     elif UOSFA_folder == "Scholarship Reports":
-        archive = os.path.realpath(os.path.join('O:\Systems\Scholarships', aid_year + ' Scholar\Queries'))
+        archive = os.path.realpath(os.path.join('O:/Systems/Scholarships', aid_year + ' Scholar/Queries'))
     elif UOSFA_folder == "Unknown Reports":
         return None
     elif UOSFA_folder == "Weekly Reports":
@@ -478,11 +479,11 @@ def do_query_unknown(name, renamed, destination, year, add_query):
         shutil.copy(current_filepath, archive)
 
     # Make subfolders in UOSFA folder
-    month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
-    datepath = Path(month) / Path(date) /Path(year)
-    UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
-    if not os.path.isdir(UOSFA_destination):
-        os.makedirs(UOSFA_destination)
+    #month = date[:2] + "-20" + date[-2:] # Possibly change to month name instead of month number
+    #datepath = Path(month) / Path(date) /Path(year)
+    #UOSFA_destination = str(Path(UOSFA_destination) / datepath) 
+    #if not os.path.isdir(UOSFA_destination):
+        #os.makedirs(UOSFA_destination)
 
     destination_filepath = rename_no_duplicates(UOSFA_destination, renamed)
     shutil.move(current_filepath, destination_filepath)

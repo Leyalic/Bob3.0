@@ -8,19 +8,19 @@ def do_dailies(test, date, year, query, renamed):
     aid_year = str(int(year) - 1) + "-" + str(year)
 
     if test:
-        archive_directory = os.path.realpath(os.path.join('C:\Testing Bob/Daily', aid_year, month_folder))
-        royall_directory = os.path.realpath('C:\Testing Bob/Royall')
-        pell_directory = os.path.realpath(os.path.join('C:\Testing Bob/QUERIES\Pell Repackaging', aid_year))
-        disb_directory = os.path.realpath('C:\Testing Bob\QUERIES\Disbursement\Pre-Disbursement Queries')
-        refund_directory = os.path.realpath(os.path.join('C:\Testing Bob/QUERIES\Refund Credit Holds', month_folder))
-        daily_ea_directory = os.path.realpath("O:\Testing Bob\External Awards\External Award Queries")
+        archive_directory = os.path.realpath(os.path.join('C:/Testing Bob/Daily', aid_year, month_folder))
+        royall_directory = os.path.realpath('C:/Testing Bob/Royall')
+        pell_directory = os.path.realpath(os.path.join('C:/Testing Bob/QUERIES/Pell Repackaging', aid_year))
+        disb_directory = os.path.realpath('C:/Testing Bob/QUERIES/Disbursement/Pre-Disbursement Queries')
+        refund_directory = os.path.realpath(os.path.join('C:/Testing Bob/QUERIES/Refund Credit Holds', month_folder))
+        daily_ea_directory = os.path.realpath("O:/Testing Bob/External Awards/External Award Queries")
     else:
         archive_directory = os.path.realpath(os.path.join('O:/Systems/QUERIES/Daily', aid_year, month_folder))
         royall_directory = os.path.realpath('O:/Systems/Royall')
-        pell_directory = os.path.realpath(os.path.join('O:\Systems\QUERIES\Pell Repackaging', aid_year))
-        disb_directory = os.path.realpath("O:\Systems\QUERIES\Disbursement\Pre-Disbursement Queries")
-        refund_directory = os.path.realpath(os.path.join('O:\Systems\QUERIES\Refund Credit Holds', month_folder))
-        daily_ea_directory = os.path.realpath("O:\Systems\External Awards\External Award Queries")
+        pell_directory = os.path.realpath(os.path.join('O:/Systems/QUERIES/Pell Repackaging', aid_year))
+        disb_directory = os.path.realpath("O:/Systems/QUERIES/Disbursement/Pre-Disbursement Queries")
+        refund_directory = os.path.realpath(os.path.join('O:/Systems/QUERIES/Refund Credit Holds', month_folder))
+        daily_ea_directory = os.path.realpath("O:/Systems/External Awards/External Award Queries")
 
 
     if not os.path.isdir(archive_directory):
@@ -225,6 +225,9 @@ def do_dailies(test, date, year, query, renamed):
 
     if "PELL_RPKG_VAR_FLAG_2" in query :
         return(query, renamed, pell_directory, move_pell_directory)
+    
+    if "UUFA_MR_PELL_NO_ELIG_FLAG" in query :
+        return(query, renamed, pell_directory, move_pell_directory)
 
     if "IL_3RD_PARTY_EXCEPT" in query :
         return (query, renamed, archive_directory, move_directory)
@@ -273,18 +276,93 @@ def do_dailies(test, date, year, query, renamed):
 
     if "UUFA_IL_OUTSIDE_RESOURCES" in query :
         return (query, renamed, archive_directory, move_directory)
+    
+    if "_IL_STDNTS_W_ISIRVW" in query :
+        return (query, renamed, archive_directory, move_directory)
+    
+    if "_IL_STDNTS_W_ISIRVW2" in query :
+        return (query, renamed, archive_directory, move_directory)
+    
+    if "UUFA_IL_ISIR_C_CODE" in query :
+        return (query, renamed, archive_directory, move_directory)
 
-    if "UUFA_EA_SCH_4UT_FS_23" in query :
+    if "UUFA_EA_SCH_4UT_FS" in query :
         return (query, renamed, daily_ea_directory, move_daily_ea)
 
-    if "UUFA_EA_SCH79PCT_FS_NO_ATH_23" in query :
+    if "UUFA_EA_SCH79PCT_FS_NO_ATH" in query :
         return (query, renamed, daily_ea_directory, move_daily_ea)
 
-    if "UUFA_EA_SCH_ATH_FS_23" in query :
+    if "UUFA_EA_SCH_ATH_FS" in query :
         return (query, renamed, daily_ea_directory, move_daily_ea)
-
-    if "UUFA_SCHADM_DUALCAR" in query :
+    
+    if "UUFA_EA_SCH79PCT_FSU_ATH" in query :
         return (query, renamed, daily_ea_directory, move_daily_ea)
+    
+    if "UUFA_EA_SCH79PCT_FSU_NO_ATH" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
+    
+    if "UUFA_EA_SCH79_FSU_4UT" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
+    
+    if "UUFA_EA_SCH79_FSU_ATH" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
+    
+    if "UUFA_JB_SCH_EA_4UT_FSU" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
+    
+    if "UUFA_JB_SCH_EA_ATH_FSU" in query :
+        return (query, renamed, daily_ea_directory, move_daily_ea)
+    
+    if "UUFA_SMR_PKG_HI_PELL_LEU" in query :
+        return(query, renamed, pell_directory, move_pell_directory)
+    
+    if "UUFA_FA_SP_PELL_SUMMER_PKG" in query :
+        return(query, renamed, pell_directory, move_pell_directory)
+    
+    if "UUFA_RPKG_HI_PELL_LEU" in query :
+        return(query, renamed, pell_directory, move_pell_directory)
+    
+    if query.startswith("UUFA_IL_GTB_REVIEW_BY_TERM") :
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_IL_STDT_W_FLNPR_INIT") :
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_IL_GTB_REVIEW_BY_TERM") :
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_IL_ALL_ITEM_SUM_OVRAWD") :
+        return (query, renamed, archive_directory, move_directory)
+    
+    if "AWARD_LOCK_SNAPSHOT" in query : 
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_DELETE_FA_TAKEN"):
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_LOAN_ACC_INC_ORT"):
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_UNACCREDITED_HS"):
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_FATERM_SOURCE_N_AWD_FC"):
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_LDR_THESIS_STUDENT_NONRES"):
+        return (query, renamed, archive_directory, move_directory)
+    
+    if query.startswith("UUFA_ISIR_NOT_MATCH"):
+        return (query, renamed, archive_directory, move_directory)
+    
+    if "ISIR_NO_MATCH" in query :
+        return (query, renamed, archive_directory, move_directory)
+    
+    if "IL_BLANK_ATB_PANEL" in query :
+        return (query, renamed, archive_directory, move_directory)
+    
+    if "IL_CMNT_CODE_NEED_RVW" in query :
+        return (query, renamed, archive_directory, move_directory)
 
     return "Empty" #Leave as last line
 
