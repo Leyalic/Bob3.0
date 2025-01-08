@@ -363,6 +363,9 @@ def do_dailies(test, date, year, query, renamed):
     
     if "IL_CMNT_CODE_NEED_RVW" in query :
         return (query, renamed, archive_directory, move_directory)
+    
+    if "UUFA_PELL_RSP_DSB_AWARD" in query :
+        return(query, renamed, pell_directory, move_pell_directory)
 
     return "Empty" #Leave as last line
 
